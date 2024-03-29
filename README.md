@@ -1,3 +1,3 @@
 # Database Project
 
-Group Members: Samantha Augustine, Steven Granaturov, Ashley Simons
+Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
