@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Form</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #333; /* Darker background */
+    color: #fff; /* Light text color for contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .form-container {
+    background-color: #444; /* Slightly lighter than body for contrast */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adjusted for darker theme */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased space between form elements */
+  }
+  input[type="text"], input[type="password"] {
+    box-sizing: border-box; /* Fixes the issue of elements extending out of the container */
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px; /* Increases bottom margin for inputs */
+    border: 1px solid #555; /* Darker border */
+    background-color: #555; /* Darker input backgrounds */
+    color: #fff; /* Ensure text is light for readability */
+    border-radius: 3px;
+  }
+  input::placeholder {
+    color: #bbb; /* Lighter gray for better visibility */
+  }
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Space between buttons */
+    padding-top: 10px; /* Adds padding on top for more space between inputs and buttons */
+  }
+  .login-btn, .register-btn {
+    flex: 1; /* Allows buttons to grow equally */
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #fff; /* Makes text inside the buttons white */
+    background-color: #007bff; /* Default color for login button */
+    margin-right: 10px; /* Adds spacing between the buttons */
+  }
+  .register-btn {
+    background-color: #28a745;
+    margin-right: 0; /* Resets the margin for the last button */
+  }
+</style>
+</head>
+<body>
+<div class="form-container">
+    {% if error %}
+            <div style="color: red;">{{ error }}</div>
+    {% endif %}
+    <form action="/loginAuth" method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <div class="button-group">
+            <button type="submit" class="login-btn">Login</button>
+            <button type="button" class="register-btn" onclick="location.href='/register'">Register</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
