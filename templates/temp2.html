@@ -40,12 +40,23 @@
     color: #fff; /* Makes text inside the buttons white */
     background-color: #007bff; /* Default color for pet register button */
   }
+  .edit-btn {
+    flex: 1; /* Allows buttons to grow equally */
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #fff; /* Makes text inside the buttons white */
+    background-color: #007bff; /* Default color for pet register button */
+  }
 </style>
 </head>
 <body>
 <div class="form-container">
     <div class="button-group">
-        <button type="button" class="pet-register-btn" onclick="location.href='/pet_register'">Register A Pet</button>
+        <button type="button" class="pet-register-btn" onclick="location.href='/pet_register'">Register a Pet</button>
+        <button type="button" class="edit-btn" onclick="location.href='/edit_pet'">Edit a Pet</button>
     </div>
 </div>
 </body>

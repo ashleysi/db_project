@@ -90,6 +90,7 @@ def home():
     user = session['username']
     return render_template('temp2.html', username=user)
 
+
 @app.route('/pet_register', methods=['GET', 'POST'])
 def pet_register():
     if request.method == 'POST':
@@ -99,7 +100,7 @@ def pet_register():
         owner_username = session['username']
 
         cursor = conn.cursor()
-        query = 'SELECT * FROM registered_pet WHERE pet_name = %s AND owner_username = %s'
+        query = 'SELECT * FROM Pets WHERE PetName = %s AND username = %s'
         cursor.execute(query, (pet_name, owner_username))
         data = cursor.fetchone()
 
@@ -108,17 +109,38 @@ def pet_register():
             cursor.close()
             return render_template('pet_register.html', error=error)
         else:
-            ins = 'INSERT INTO registered_pet (pet_name, pet_type, pet_size, owner_username) VALUES (%s, %s, %s, %s)'
+            ins = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
             cursor.execute(ins, (pet_name, pet_type, pet_size, owner_username))
             conn.commit()
             cursor.close()
-            return render_template('registerPet.html')  # Redirect to thank you page after successful pet registration
+            return render_template('registerPet.html', message='Pet registered successfully!')
     else:
-        return render_template('pet_register.html')
+        return render_template('pet_register.html')  
+
 
 @app.route('/registerPet', methods=['GET', 'POST'])
 def registered_pet():
     return render_template('registerPet.html')
+
+
+@app.route('/edit_pet')
+def edit_pet():
+    if request.method == 'POST':
+        pet_id = request.form['pet_id']
+        new_pet_name = request.form['new_pet_name']
+        new_pet_type = request.form['new_pet_type']
+        new_pet_size = request.form['new_pet_size']
+        owner_username = session['username']
+
+        cursor = conn.cursor()
+        query = 'UPDATE registered_pet SET pet_name = %s, pet_type = %s, pet_size = %s WHERE id = %s AND owner_username = %s'
+        cursor.execute(query, (new_pet_name, new_pet_type, new_pet_size, pet_id, owner_username))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for('thank_you'))
+    else:
+        return render_template('edit_pet.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
