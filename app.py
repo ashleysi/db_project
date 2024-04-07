@@ -11,8 +11,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='root',
-    db='roomio',
+    password='083723',
+    db='Roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
