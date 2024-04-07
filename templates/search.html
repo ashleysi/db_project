@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Page</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: #fff; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150vh;
+    margin: 0;
+  }
+  .form-container {
+    background-color: #444; 
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+    display: flex;
+    flex-direction: column;
+    gap: 20px; 
+  }
+  input[type="text"] {
+    box-sizing: border-box; 
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px; 
+    border: 1px solid #555; 
+    background-color: #555; 
+    color: #fff; 
+    border-radius: 3px;
+  }
+  input::placeholder {
+    color: #bbb; 
+  }
+  button[type="submit"] {
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #fff; 
+    background-color: #007bff; 
+  }
+  button[type="submit"]:hover {
+    background-color: #0056b3; 
+  }
+  h2 {
+    margin-top: 20px;
+  }
+  ul {
+    list-style: none; 
+    padding: 0;
+  }
+  ul li {
+    margin-bottom: 20px; 
+  }
+</style>
+</head>
+<body>
+<div class="form-container">
+  <h1> <center> <u> Welcome, {{ user }} </u> </center></h1>
+  <h1>Search</h1>
+  <form action="/home/search" method="GET">
+    <label for="company_name">Enter Company Name:</label>
+    <input type="text" name="company_name" id="company_name" required>
+    <label for="building_name">Enter Building Name:</label>
+    <input type="text" name="building_name" id="building_name">  <br>
+    <h2>Advanced Search Features:</h2>
+    <label for="pet_y_n">Allow My Pet:</label>
+    <input type="checkbox" name="pet_y_n" id="pet_y_n">
+    <br>
+
+    <label for="minimum_rent">Minimum Rent:</label>
+    <input type="number" name="minimum_rent" id="minimum_rent">
+    <label for="maximum_rent">Maximum Rent:</label>
+    <input type="number" name="maximum_rent" id="maximum_rent">
+    <br>
+
+
+    <button type="submit">Search</button>
+</form>
+
+<h2>Search Results</h2>
+{% if not units %}
+  <p>No units found.</p>
+{% else %}
+  <ul>
+    {% for unit in units %}
+      <li>
+        Company Name: {{ unit['CompanyName'] }}<br>
+        Building Name: {{ unit['BuildingName'] }}<br>
+        Unit Number: {{ unit['unitNumber'] }}<br>
+        Monthly Rent: ${{ unit['MonthlyRent'] }}<br>
+        Square Footage: {{ unit['squareFootage'] }} sq ft<br>
+        Available Date: {{ unit['AvailableDateForMoveIn'] }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+</div>
+</body>
+</html>
+

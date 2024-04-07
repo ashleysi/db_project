@@ -126,6 +126,17 @@ def register_pet():
         return render_template('registerPet.html')
 
 
+@app.route('/registerPet')
+def registered_pet():
+    owner_username = session.get('username')  # Get the logged-in user's username from the session
+    cursor = conn.cursor()
+    query = 'SELECT PetName, PetType, PetSize FROM Pets WHERE username = %s'
+    cursor.execute(query, (owner_username,))
+    pets = cursor.fetchall()  # Fetch all pets for the logged-in user
+    cursor.close()
+    return render_template('registeredPet.html', pets=pets)
+
+
 
 @app.route('/edit_pet')
 def edit_pet():

@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Registered Pets</title>
 </head>
 <body>
-    <p>Thank you for registering your pet!</p>
+    <h1>Registered Pets</h1>
+    <ul>
+        {% for pet in Pets %}
+        <li>
+            <strong>Pet Name:</strong> {{ Pets.PetName }}<br>
+            <strong>Pet Type:</strong> {{ Pets.PetType }}<br>
+            <strong>Pet Size:</strong> {{ Pets.PetSize }}<br>
+        </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
