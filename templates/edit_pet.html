@@ -46,22 +46,18 @@
 <body>
 <div class="container">
     <h1>Edit Pet Information</h1>
-    <form action="/edit_pet" method="post">
-        <select name="pet_type" required>
-            <option value="" disabled selected>Select Pet Type</option>
-            <option value="Dog">Dog</option>
-            <option value="Cat">Cat</option>
-            <!-- Add more options for other pet types -->
-        </select>
-        <select name="pet_name" required>
-            <option value="" disabled selected>Select Pet Name</option>
-            <option value="Buddy">Buddy</option>
-            <option value="Max">Max</option>
-            <!-- Add more options for other pet names -->
-        </select>
-        <input type="text" name="new_pet_size" placeholder="New Pet Size" required>
-        <input type="submit" value="Submit">
+    <form action="/edit_pet" method="POST">
+        <label for="pet">Select Pet:</label>
+        <select id="pet" name="pet" required>
+            {% for pet in pets %}
+                <option value="{{ pet.PetName }}-{{ pet.PetType }}">{{ pet.PetName }} - {{ pet.PetType }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="new_pet_size">New Pet Size:</label>
+        <input type="text" id="new_pet_size" name="new_pet_size" required><br>
+        <button type="submit">Save Changes</button>
     </form>
 </div>
 </body>
 </html>
+

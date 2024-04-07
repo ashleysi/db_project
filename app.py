@@ -11,8 +11,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='083723',
-    db='Roomio',
+    password='root',
+    db='roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -243,23 +243,30 @@ def registered_pet():
 
 
 
-@app.route('/edit_pet')
+@app.route('/edit_pet', methods=['GET', 'POST'])
 def edit_pet():
     if request.method == 'POST':
-        pet_id = request.form['pet_id']
-        new_pet_name = request.form['new_pet_name']
-        new_pet_type = request.form['new_pet_type']
+        pet_name_type = request.form['pet']
         new_pet_size = request.form['new_pet_size']
         owner_username = session['username']
+        
+        pet_name, pet_type = pet_name_type.split('-')
 
         cursor = conn.cursor()
-        query = 'UPDATE registered_pet SET pet_name = %s, pet_type = %s, pet_size = %s WHERE id = %s AND owner_username = %s'
-        cursor.execute(query, (new_pet_name, new_pet_type, new_pet_size, pet_id, owner_username))
+        query = 'UPDATE Pets SET PetSize = %s WHERE PetName = %s AND PetType = %s AND username = %s'
+        cursor.execute(query, (new_pet_size, pet_name, pet_type, owner_username))
         conn.commit()
         cursor.close()
-        return redirect(url_for('thank_you'))
+        return redirect(url_for('registered_pet'))
     else:
-        return render_template('edit_pet.html')
+        owner_username = session.get('username') 
+        cursor = conn.cursor()
+        query = 'SELECT PetName, PetType FROM Pets WHERE username = %s'
+        cursor.execute(query, (owner_username,))
+        pets = cursor.fetchall()
+        cursor.close()
+        return render_template('edit_pet.html', pets=pets)
+
 
 
 if __name__ == '__main__':
