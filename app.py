@@ -8,10 +8,11 @@ app.secret_key = 'steven'
 
 conn = pymysql.connect(
     host = '127.0.0.1',
+    #host = 'localhost',
     port = 3306,
     user = 'root',
-    password = '083723',
-    db = 'Roomio',
+    password = 'root',
+    db = 'proj_schema',
     charset = 'utf8mb4',
     cursorclass = pymysql.cursors.DictCursor
 )
@@ -88,6 +89,12 @@ def registerAuth():
 def home():
     user = session['username']
     return render_template('temp2.html', username=user)
+
+
+@app.route('/pet_register')
+def pet_register():
+    return render_template('pet_register.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
