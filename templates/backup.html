@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search Page</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #333; /* Darker background */
+    color: #fff; /* Light text color for contrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150vh;
+    margin: 0;
+  }
+  .form-container {
+    background-color: #444; /* Slightly lighter than body for contrast */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adjusted for darker theme */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased space between form elements */
+  }
+  input[type="text"] {
+    box-sizing: border-box; /* Fixes the issue of elements extending out of the container */
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px; /* Increases bottom margin for inputs */
+    border: 1px solid #555; /* Darker border */
+    background-color: #555; /* Darker input backgrounds */
+    color: #fff; /* Ensure text is light for readability */
+    border-radius: 3px;
+  }
+  input::placeholder {
+    color: #bbb; /* Lighter gray for better visibility */
+  }
+  button[type="submit"] {
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #fff; /* Makes text inside the buttons white */
+    background-color: #007bff; /* Default color for login button */
+  }
+  button[type="submit"]:hover {
+    background-color: #0056b3; /* Darker color on hover */
+  }
+  h2 {
+    margin-top: 20px; /* Add margin above search results */
+  }
+  ul {
+    list-style: none; /* Remove default list style */
+    padding: 0;
+  }
+  ul li {
+    margin-bottom: 20px; /* Add space between each search result */
+  }
+</style>
+</head>
+<body>
+<div class="form-container">
+  <h1> <center> <u> Welcome, {{ user }} </u> </center></h1>
+  <h1>Search</h1>
+  <form action="/home/search" method="GET">
+    <label for="field1">Enter Company Name:</label>
+    <input type="text" name="field1" id="field1" required>
+    <label for="field2">Enter Building Name:</label>
+    <input type="text" name="field2" id="field2">  <br>
+    <h2>Advanced Search Features:</h2>
+    <label for="allows_pets">Allow My Pet:</label>
+    <input type="checkbox" name="allows_pets" id="allows_pets">
+    <br>
+
+    <label for="min_rent">Minimum Rent:</label>
+    <input type="number" name="min_rent" id="min_rent">
+    <label for="max_rent">Maximum Rent:</label>
+    <input type="number" name="max_rent" id="max_rent">
+    <br>
+
+    <h3>Amenities (select all that apply):</h3>
+    <input type="checkbox" name="amenities" value="balcony"> Balcony<br>
+    <input type="checkbox" name="amenities" value="dishwasher"> Dishwasher<br>
+    <input type="checkbox" name="amenities" value="in_unit_laundry"> In-Unit Laundry<br>
+
+    <button type="submit">Search</button>
+</form>
+
+<h2>Search Results</h2>
+{% if not units %}
+  <p>No units found for the given criteria.</p>
+{% else %}
+  <ul>
+    {% for unit in units %}
+      <li>
+        Company Name: {{ unit['CompanyName'] }}<br>
+        Building Name: {{ unit['BuildingName'] }}<br>
+        Unit Number: {{ unit['unitNumber'] }}<br>
+        Monthly Rent: ${{ unit['MonthlyRent'] }}<br>
+        Square Footage: {{ unit['squareFootage'] }} sq ft<br>
+        Available Date: {{ unit['AvailableDateForMoveIn'] }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+</div>
+</body>
+</html>
+

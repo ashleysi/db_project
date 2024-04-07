@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, url_for, redirect
 from passlib.hash import pbkdf2_sha256
 import pymysql.cursors
+import mysql.connector
 
 app = Flask(__name__)
 
@@ -10,8 +11,9 @@ conn = pymysql.connect(
     host = '127.0.0.1',
     port = 3306,
     user = 'root',
-    password = '083723',
-    db = 'Roomio',
+    #password = '083723',
+    password = 'Saugust1678@',
+    db = 'roomio',
     charset = 'utf8mb4',
     cursorclass = pymysql.cursors.DictCursor
 )
@@ -89,5 +91,112 @@ def home():
     user = session['username']
     return render_template('temp2.html', username=user)
 
+@app.route('/home/search', methods = ['GET'])
+def search():
+    user = session['username']
+    company_name = request.args.get('company_name')
+    building_name = request.args.get('building_name')
+    pet_y_n = request.args.get('pet_y_n', type=bool)
+    minimum_rent = request.args.get('minimum_rent', type=int)
+    maximum_rent = request.args.get('maximum_rent', type=int)
+    cursor = conn.cursor()
+    
+    if ((company_name is None) & (building_name is None)):
+        cursor.close()
+        return render_template('search.html', user=user)
+    elif (pet_y_n is True):
+        x= "WHERE 1=1"
+
+        if company_name:
+            x+= " AND ApartmentBuilding.CompanyName = %s"
+        if building_name:
+            x+= " AND ApartmentUnit.BuildingName = %s"
+
+        query1 = f"""
+            SELECT DISTINCT ApartmentUnit.CompanyName, ApartmentUnit.BuildingName, ApartmentUnit.unitNumber, ApartmentUnit.MonthlyRent, ApartmentUnit.squareFootage, ApartmentUnit.AvailableDateForMoveIn
+            FROM ApartmentUnit
+            JOIN ApartmentBuilding ON ApartmentUnit.CompanyName = ApartmentBuilding.CompanyName AND ApartmentUnit.BuildingName = ApartmentBuilding.BuildingName
+            JOIN PetPolicy ON ApartmentUnit.CompanyName = PetPolicy.CompanyName AND ApartmentUnit.BuildingName = PetPolicy.BuildingName \
+            JOIN Interests ON ApartmentUnit.UnitRentID = Interests.UnitRentID \
+            JOIN Users ON Interests.username = Users.username \
+            JOIN Pets ON Users.username = Pets.username = '{user}' \
+            AND PetPolicy.PetType = 'Dog' AND PetPolicy.PetSize = 'Large'
+            {x}
+        """
+        print (query1)
+        
+        add_ons = []
+        if company_name:
+            add_ons = add_ons  + [company_name]
+        if building_name:
+            add_ons = add_ons  + [building_name]
+        if minimum_rent:
+            add_ons = add_ons  + [minimum_rent]
+        if maximum_rent:
+            add_ons = add_ons  + [maximum_rent]
+    
+        #cursor.execute(query1,(building_name, company_name))
+        cursor.execute(query1,add_ons)
+        units = cursor.fetchall()
+
+
+        cursor.close()
+            
+        #return render_template('search.html', user=user)
+
+        #return render_template('search.html', user=user, units=units)
+
+        return render_template('search.html', user=user, units=units,
+                               company_name=company_name, building_name=building_name, pet_y_n=pet_y_n,
+                              minimum_rent=minimum_rent, maximum_rent=maximum_rent)
+    
+    else: 
+        x= "WHERE 1=1" 
+
+        if company_name:
+            x+= " AND ApartmentBuilding.CompanyName = %s"
+        if building_name:
+            x+= " AND ApartmentUnit.BuildingName = %s"
+
+        # Search for apartment units based on building name and company name
+        #query1 = 'SELECT ApartmentUnit.unitNumber, ApartmentUnit.MonthlyRent, ApartmentUnit.squareFootage, ApartmentUnit.AvailableDateForMoveIn \
+        #        FROM ApartmentUnit \
+        #        JOIN ApartmentBuilding ON ApartmentUnit.CompanyName = ApartmentBuilding.CompanyName AND ApartmentUnit.BuildingName = ApartmentBuilding.BuildingName \
+        #        WHERE ApartmentUnit.BuildingName = %s AND ApartmentUnit.CompanyName = %s'
+        query1 = f"""
+            SELECT DISTINCT ApartmentUnit.CompanyName, ApartmentUnit.BuildingName, ApartmentUnit.unitNumber, ApartmentUnit.MonthlyRent, ApartmentUnit.squareFootage, ApartmentUnit.AvailableDateForMoveIn
+            FROM ApartmentUnit
+            JOIN ApartmentBuilding ON ApartmentUnit.CompanyName = ApartmentBuilding.CompanyName AND ApartmentUnit.BuildingName = ApartmentBuilding.BuildingName
+            {x}
+        """
+        print (query1)
+        
+        add_ons = []
+        
+        if company_name:
+            add_ons = add_ons  + [company_name]
+        if building_name:
+            add_ons = add_ons  + [building_name]
+        if minimum_rent:
+            add_ons = add_ons  + [minimum_rent]
+        if maximum_rent:
+            add_ons = add_ons  + [maximum_rent]
+    
+        #cursor.execute(query1,(building_name, company_name))
+        cursor.execute(query1,add_ons)
+        units = cursor.fetchall()
+
+
+        cursor.close()
+            
+        #return render_template('search.html', user=user)
+
+        #return render_template('search.html', user=user, units=units)
+
+        return render_template('search.html', user=user, units=units,
+                               company_name=company_name, building_name=building_name,
+                              minimum_rent=minimum_rent, maximum_rent=maximum_rent)
+        
+    
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=3000, debug=True)
