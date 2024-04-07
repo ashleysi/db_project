@@ -12,7 +12,7 @@ conn = pymysql.connect(
     port=3306,
     user='root',
     password='root',
-    db='proj_schema',
+    db='roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -93,6 +93,12 @@ def home():
 
 @app.route('/pet_register', methods=['GET', 'POST'])
 def pet_register():
+    user = session['username']
+    return render_template('pet_register.html', username=user)  
+
+
+@app.route('/registerPet', methods=['GET', 'POST'])
+def register_pet():
     if request.method == 'POST':
         pet_name = request.form['pet_name']
         pet_type = request.form['pet_type']
@@ -100,6 +106,8 @@ def pet_register():
         owner_username = session['username']
 
         cursor = conn.cursor()
+
+        # Check if the pet already exists 
         query = 'SELECT * FROM Pets WHERE PetName = %s AND username = %s'
         cursor.execute(query, (pet_name, owner_username))
         data = cursor.fetchone()
@@ -107,7 +115,7 @@ def pet_register():
         if data:
             error = 'This pet already exists'
             cursor.close()
-            return render_template('pet_register.html', error=error)
+            return render_template('registerPet.html', error=error)
         else:
             ins = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
             cursor.execute(ins, (pet_name, pet_type, pet_size, owner_username))
@@ -115,12 +123,8 @@ def pet_register():
             cursor.close()
             return render_template('registerPet.html', message='Pet registered successfully!')
     else:
-        return render_template('pet_register.html')  
+        return render_template('registerPet.html')
 
-
-@app.route('/registerPet', methods=['GET', 'POST'])
-def registered_pet():
-    return render_template('registerPet.html')
 
 
 @app.route('/edit_pet')
