@@ -30,17 +30,7 @@
     gap: 10px; /* Space between buttons */
     padding-top: 10px; /* Adds padding on top for more space between inputs and buttons */
   }
-  .pet-register-btn {
-    flex: 1; /* Allows buttons to grow equally */
-    padding: 10px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #fff; /* Makes text inside the buttons white */
-    background-color: #007bff; /* Default color for pet register button */
-  }
-  .edit-btn {
+  .blue-btn {
     flex: 1; /* Allows buttons to grow equally */
     padding: 10px;
     border: none;
@@ -55,8 +45,9 @@
 <body>
 <div class="form-container">
     <div class="button-group">
-        <button type="button" class="pet-register-btn" onclick="location.href='/pet_register'">Register a Pet</button>
-        <button type="button" class="edit-btn" onclick="location.href='/edit_pet'">Edit a Pet</button>
+        <button type="button" class="blue-btn" onclick="location.href='/pet_register'">Register a Pet</button>
+        <button type="button" class="blue-btn" onclick="location.href='/edit_pet'">Edit a Pet</button>
+        <button type="button" class="blue-btn" onclick="location.href='/home/search'">Seach Apartments</button>
     </div>
 </div>
 </body>
