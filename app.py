@@ -161,6 +161,15 @@ def edit_pet():
         cursor.close()
         return render_template('edit_pet.html', pets=pets)
 
+@app.route('/user_pets')
+def user_pets():
+    owner_username = session.get('username')  # Get the logged-in user's username from the session
+    cursor = conn.cursor()
+    query = 'SELECT PetName, PetType FROM Pets WHERE username = %s'
+    cursor.execute(query, (owner_username,))
+    pets = cursor.fetchall()  # Fetch all pets for the logged-in user
+    cursor.close()
+    return render_template('user_pets.html', pets=pets)
 
 @app.route('/home/search', methods = ['GET'])
 def search():
