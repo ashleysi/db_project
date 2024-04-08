@@ -90,6 +90,78 @@ def home():
     user = session['username']
     return render_template('temp2.html', username=user)
 
+@app.route('/pet_register', methods=['GET', 'POST'])
+def pet_register():
+    user = session['username']
+    return render_template('pet_register.html', username=user)  
+
+
+@app.route('/registerPet', methods=['GET', 'POST'])
+def register_pet():
+    if request.method == 'POST':
+        pet_name = request.form['pet_name']
+        pet_type = request.form['pet_type']
+        pet_size = request.form['pet_size']
+        owner_username = session['username']
+
+        cursor = conn.cursor()
+
+        # Check if the pet already exists 
+        query = 'SELECT * FROM Pets WHERE PetName = %s AND username = %s'
+        cursor.execute(query, (pet_name, owner_username))
+        data = cursor.fetchone()
+
+        if data:
+            error = 'This pet already exists'
+            cursor.close()
+            return render_template('registerPet.html', error=error)
+        else:
+            ins = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
+            cursor.execute(ins, (pet_name, pet_type, pet_size, owner_username))
+            conn.commit()
+            cursor.close()
+            return render_template('registerPet.html', message='Pet registered successfully!')
+    else:
+        return render_template('registerPet.html')
+
+
+@app.route('/registerPet')
+def registered_pet():
+    owner_username = session.get('username')  # Get the logged-in user's username from the session
+    cursor = conn.cursor()
+    query = 'SELECT PetName, PetType, PetSize FROM Pets WHERE username = %s'
+    cursor.execute(query, (owner_username,))
+    pets = cursor.fetchall()  # Fetch all pets for the logged-in user
+    cursor.close()
+    return render_template('registeredPet.html', pets=pets)
+
+
+
+@app.route('/edit_pet', methods=['GET', 'POST'])
+def edit_pet():
+    if request.method == 'POST':
+        pet_name_type = request.form['pet']
+        new_pet_size = request.form['new_pet_size']
+        owner_username = session['username']
+        
+        pet_name, pet_type = pet_name_type.split('-')
+
+        cursor = conn.cursor()
+        query = 'UPDATE Pets SET PetSize = %s WHERE PetName = %s AND PetType = %s AND username = %s'
+        cursor.execute(query, (new_pet_size, pet_name, pet_type, owner_username))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for('registered_pet'))
+    else:
+        owner_username = session.get('username') 
+        cursor = conn.cursor()
+        query = 'SELECT PetName, PetType FROM Pets WHERE username = %s'
+        cursor.execute(query, (owner_username,))
+        pets = cursor.fetchall()
+        cursor.close()
+        return render_template('edit_pet.html', pets=pets)
+
+
 @app.route('/home/search', methods = ['GET'])
 def search():
     user = session['username']
@@ -98,7 +170,30 @@ def search():
     pet_y_n = request.args.get('pet_y_n', type=bool)
     minimum_rent = request.args.get('minimum_rent', type=int)
     maximum_rent = request.args.get('maximum_rent', type=int)
+
+    query_pet_type = f"""
+        SELECT PetType 
+        FROM Pets NATURAL JOIN Users
+        WHERE Users.username = '{user}'
+    """
+    
+    query_pet_size = f"""
+        SELECT PetSize
+        FROM Pets NATURAL JOIN Users
+        WHERE Users.username = '{user}'
+    """
+    
     cursor = conn.cursor()
+    
+    cursor.execute(query_pet_type)
+    pet_type1 = cursor.fetchall()
+    #print(pet_type1)
+    pet_type2 = pet_type1[0]['PetType']
+    #print(pet_type2)
+    
+    cursor.execute(query_pet_size)
+    pet_size1 = cursor.fetchall()
+    pet_size2 = pet_size1[0]['PetSize']
     
     if ((company_name is None) & (building_name is None)):
         cursor.close()
@@ -119,7 +214,7 @@ def search():
             JOIN Interests ON ApartmentUnit.UnitRentID = Interests.UnitRentID \
             JOIN Users ON Interests.username = Users.username \
             JOIN Pets ON Users.username = Pets.username = '{user}' \
-            AND PetPolicy.PetType = 'Dog' AND PetPolicy.PetSize = 'Large'
+            AND PetPolicy.PetType = '{pet_type2}' AND PetPolicy.PetSize = '{pet_size2}'
             {x}
         """
         print (query1)
@@ -195,79 +290,6 @@ def search():
         return render_template('search.html', user=user, units=units,
                                company_name=company_name, building_name=building_name,
                               minimum_rent=minimum_rent, maximum_rent=maximum_rent)
-
-@app.route('/pet_register', methods=['GET', 'POST'])
-def pet_register():
-    user = session['username']
-    return render_template('pet_register.html', username=user)  
-
-
-@app.route('/registerPet', methods=['GET', 'POST'])
-def register_pet():
-    if request.method == 'POST':
-        pet_name = request.form['pet_name']
-        pet_type = request.form['pet_type']
-        pet_size = request.form['pet_size']
-        owner_username = session['username']
-
-        cursor = conn.cursor()
-
-        # Check if the pet already exists 
-        query = 'SELECT * FROM Pets WHERE PetName = %s AND username = %s'
-        cursor.execute(query, (pet_name, owner_username))
-        data = cursor.fetchone()
-
-        if data:
-            error = 'This pet already exists'
-            cursor.close()
-            return render_template('registerPet.html', error=error)
-        else:
-            ins = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
-            cursor.execute(ins, (pet_name, pet_type, pet_size, owner_username))
-            conn.commit()
-            cursor.close()
-            return render_template('registerPet.html', message='Pet registered successfully!')
-    else:
-        return render_template('registerPet.html')
-
-
-@app.route('/registerPet')
-def registered_pet():
-    owner_username = session.get('username')  # Get the logged-in user's username from the session
-    cursor = conn.cursor()
-    query = 'SELECT PetName, PetType, PetSize FROM Pets WHERE username = %s'
-    cursor.execute(query, (owner_username,))
-    pets = cursor.fetchall()  # Fetch all pets for the logged-in user
-    cursor.close()
-    return render_template('registeredPet.html', pets=pets)
-
-
-
-@app.route('/edit_pet', methods=['GET', 'POST'])
-def edit_pet():
-    if request.method == 'POST':
-        pet_name_type = request.form['pet']
-        new_pet_size = request.form['new_pet_size']
-        owner_username = session['username']
-        
-        pet_name, pet_type = pet_name_type.split('-')
-
-        cursor = conn.cursor()
-        query = 'UPDATE Pets SET PetSize = %s WHERE PetName = %s AND PetType = %s AND username = %s'
-        cursor.execute(query, (new_pet_size, pet_name, pet_type, owner_username))
-        conn.commit()
-        cursor.close()
-        return redirect(url_for('registered_pet'))
-    else:
-        owner_username = session.get('username') 
-        cursor = conn.cursor()
-        query = 'SELECT PetName, PetType FROM Pets WHERE username = %s'
-        cursor.execute(query, (owner_username,))
-        pets = cursor.fetchall()
-        cursor.close()
-        return render_template('edit_pet.html', pets=pets)
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
