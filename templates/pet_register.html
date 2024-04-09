@@ -46,9 +46,24 @@
     color: #fff; 
     background-color: #007bff;
   }
+  .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    text-decoration: none;
+    background-color: #666; /* Lighter than body for visibility */
+    color: #fff; /* Text color */
+    border-radius: 3px;
+    font-size: 16px;
+  }
+  .back-btn:hover {
+    background-color: #777;
+  }
 </style>
 </head>
 <body>
+  <a href="/home" class="back-btn">&lt; Back</a>
 <div class="form-container">
     <form action="/registerPet" method="POST">
         <input type="text" name="pet_name" placeholder="Pet's Name" required>

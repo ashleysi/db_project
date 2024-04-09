@@ -11,8 +11,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='root',
-    db='roomio',
+    password='083723',
+    db='Roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -87,8 +87,12 @@ def registerAuth():
 
 @app.route('/home')
 def home():
-    user = session['username']
-    return render_template('temp2.html', username=user)
+    user = session.get('username')
+    if not user:
+        print("Redirecting to login: 'username' not in session")  # Debug: log redirect reason
+        return redirect(url_for('login'))
+    return render_template('home.html', username=user)
+
 
 @app.route('/pet_register', methods=['GET', 'POST'])
 def pet_register():
@@ -134,8 +138,6 @@ def registered_pet():
     pets = cursor.fetchall()  # Fetch all pets for the logged-in user
     cursor.close()
     return render_template('registeredPet.html', pets=pets)
-
-
 
 @app.route('/edit_pet', methods=['GET', 'POST'])
 def edit_pet():
