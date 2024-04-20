@@ -40,7 +40,16 @@
     color: #fff; 
     background-color: #007bff; 
   }
+  .welcome-message {
+            position: absolute; /* Absolute positioning */
+            top: 0; /* Zero distance from the top */
+            left: 0; /* Zero distance from the left */
+            padding: 10px; /* Padding around text */
+            font-size: 24px; /* Larger font size */
+            border-bottom-right-radius: 10px; /* Rounded corner on the bottom right */
+  }
 </style>
+<div class="welcome-message">Welcome, {{ username }}!</div>
 </head>
 <body>
 <div class="form-container">
