@@ -11,7 +11,7 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='083723',
+    password='Database',
     db='Roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
@@ -83,7 +83,7 @@ def registerAuth():
         cursor.execute(ins, (username, first_name, last_name, DOB, gender, email, phone, hashed_password))
         conn.commit()
         cursor.close()
-        return render_template('temp.html')
+        return render_template('index.html')
 
 @app.route('/home')
 def home():
