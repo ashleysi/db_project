@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Buildings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #555;
+            background-color: #555;
+            color: #fff;
+            border-radius: 3px;
+        }
+        input::placeholder {
+            color: #bbb;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <form id="searchForm">
+            <input type="text" id="state" name="state" placeholder="State">
+            <input type="text" id="city" name="city" placeholder="City">
+            <input type="text" id="zipCode" name="zipCode" placeholder="Zip Code">
+            <input type="number" id="yearBuilt" name="yearBuilt" placeholder="Year Built">
+            <button type="button" onclick="fetchData()">Search</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company Name</th>
+                    <th>Building Name</th>
+                    <th>Address Number</th>
+                    <th>Address Street</th>
+                    <th>Address City</th>
+                    <th>Address State</th>
+                    <th>Zip Code</th>
+                    <th>Year Built</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Results will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function fetchData() {
+            const formData = new FormData(document.getElementById('searchForm'));
+            fetch('/search2_results', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = ''; // Clear existing rows
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    Object.values(row).forEach(text => {
+                        const td = document.createElement('td');
+                        td.textContent = text;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

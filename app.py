@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, url_for, redirect
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify
 from passlib.hash import pbkdf2_sha256
 import pymysql.cursors
 
@@ -12,7 +12,7 @@ conn = pymysql.connect(
     port=3306,
     user='root',
     password='Database',
-    db='Roomio',
+    db='Roomio2',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -173,7 +173,36 @@ def user_pets():
     cursor.close()
     return render_template('user_pets.html', pets=pets)
 
-@app.route('/home/search', methods = ['GET'])
+@app.route('/search2')
+def search2():
+    return render_template('search2.html')
+
+@app.route('/search2_results', methods=['POST'])
+def search2_results():
+    state = request.form.get('state')
+    city = request.form.get('city')
+    zipCode = request.form.get('zipCode')
+    yearBuilt = request.form.get('yearBuilt')
+    query = 'SELECT * FROM ApartmentBuilding WHERE 1=1'
+    
+    if state:
+        query += f" AND AddrState = '{state}'"
+    if city:
+        query += f" AND AddrCity = '{city}'"
+    if zipCode:
+        query += f" AND AddrZipCode = '{zipCode}'"
+    if yearBuilt:
+        query += f" AND YearBuilt = '{yearBuilt}'"
+    
+    cursor = conn.cursor()
+    cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return jsonify(result)
+
+@app.route('/search', methods = ['GET'])
 def search():
     user = session['username']
     company_name = request.args.get('company_name')
