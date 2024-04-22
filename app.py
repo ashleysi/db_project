@@ -183,15 +183,15 @@ def search2_results():
     city = request.form.get('city')
     zipCode = request.form.get('zipCode')
     yearBuilt = request.form.get('yearBuilt')
-    query = 'SELECT * FROM ApartmentBuilding WHERE 1=1'
+    query = 'SELECT * FROM ApartmentBuilding'
     
-    if state:
+    if state != '':
         query += f" AND AddrState = '{state}'"
-    if city:
+    if city != '':
         query += f" AND AddrCity = '{city}'"
-    if zipCode:
+    if zipCode != '':
         query += f" AND AddrZipCode = '{zipCode}'"
-    if yearBuilt:
+    if yearBuilt != '':
         query += f" AND YearBuilt = '{yearBuilt}'"
     
     cursor = conn.cursor()
