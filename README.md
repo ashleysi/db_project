@@ -55,6 +55,20 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
 - **Recommend System**:
   - Recommend similar units within and outside the same buildings based on user-defined criteria.
 
-## Additional Notes
+## Setup Instructions
 
-TODO
+- ** Setup Instructions:
+- Please drop all tables
+- Recreate all tables + Favorites table with Schema below.
+- Insert all values from sample_data.txt
+- Passwords for all those accounts is 'password'
+
+Favorite table:
+CREATE TABLE Favorite (
+    FavoriteID INT AUTO_INCREMENT PRIMARY KEY,
+    Username VARCHAR(20) NOT NULL,
+    UnitRentID INT NOT NULL,
+    FOREIGN KEY (Username) REFERENCES Users(username),
+    FOREIGN KEY (UnitRentID) REFERENCES ApartmentUnit(UnitRentID),
+    UNIQUE (Username, UnitRentID)
+);
