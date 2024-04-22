@@ -7,38 +7,63 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #333; /* Darker background */
-            color: #fff; /* Light text color for contrast */
+            background-color: #333;
+            color: #fff;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Align children vertically */
             align-items: center;
             height: 100vh;
             margin: 0;
+            padding: 20px;
+            overflow-y: auto; /* Allow scrolling if the content is tall */
         }
-
         .container {
-            background-color: #444; /* Slightly lighter than body for contrast */
+            width: 80%;
+            background-color: #444;
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adjusted for darker theme */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px; /* Space between containers */
         }
-
-        h1 {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #777;
             text-align: center;
-            margin-bottom: 20px; /* Adds bottom margin for spacing */
         }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
+        th {
+            background-color: #555;
         }
-
-        li {
-            margin-bottom: 10px;
+        .edit-btn, .delete-btn, .add-btn {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s; /* Smooth transition for hover effects */
         }
-
-        p {
-            text-align: center;
+        .edit-btn {
+            background-color: #6699cc;
+        }
+        .edit-btn:hover {
+            background-color: #5577bb;
+        }
+        .delete-btn {
+            background-color: #ff3333;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+        .add-btn {
+            background-color: #4CAF50;
+            width: 100%; /* Full width button */
+            padding: 10px 20px; /* Larger padding */
+        }
+        .add-btn:hover {
+            background-color: #45a049;
         }
         .back-btn {
             position: absolute;
@@ -46,26 +71,66 @@
             left: 20px;
             padding: 10px 15px;
             text-decoration: none;
-            background-color: #666; /* Lighter than body for visibility */
-            color: #fff; /* Text color */
+            background-color: #666;
+            color: #fff;
             border-radius: 3px;
             font-size: 16px;
         }
         .back-btn:hover {
             background-color: #777;
         }
+        .add-btn {
+            padding: 10px 20px; 
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            width: auto; 
+            display: inline-block; 
+            margin: 0 auto 20px; 
+        }
+
     </style>
 </head>
 <body>
     <a href="/home" class="back-btn">&lt; Back</a>
     <div class="container">
+        <div style="text-align: center;"> <!-- Center alignment for the button -->
+            <button onclick="location.href='/add_pet'" class="add-btn">Add Pet</button>
+        </div>
+    </div>
+    <div class="container">
         <h1>Your Pets</h1>
         {% if pets %}
-            <ul>
-                {% for pet in pets %}
-                    <li>{{ pet.PetName }} - {{ pet.PetType }}</li>
-                {% endfor %}
-            </ul>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pet Name</th>
+                        <th>Pet Type</th>
+                        <th>Pet Size</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pet in pets %}
+                    <tr>
+                        <td>{{ pet.PetName }}</td>
+                        <td>{{ pet.PetType }}</td>
+                        <td>{{ pet.PetSize }}</td>
+                        <td><button class="edit-btn" onclick="location.href='{{ url_for('edit_pet_detail', pet_name=pet.PetName, pet_type=pet.PetType) }}'">Edit</button></td>
+                        <td>
+                            <form action="{{ url_for('delete_pet') }}" method="post" onsubmit="return confirm('Are you sure you want to delete this pet?');">
+                                <input type="hidden" name="pet_name" value="{{ pet.PetName }}">
+                                <input type="hidden" name="pet_type" value="{{ pet.PetType }}">
+                                <button type="submit" class="delete-btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
             <p>No Registered Pets</p>
         {% endif %}

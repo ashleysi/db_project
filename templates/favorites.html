@@ -86,7 +86,7 @@
                         <th>Unit Number</th>
                         <th>Monthly Rent</th>
                         <th>Square Footage</th>
-                        <th>Available Date For Move-In</th>
+                        <th>Available Move-In Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -95,7 +95,7 @@
                         <tr>
                             <td>{{ unit.unitNumber }}</td>
                             <td>${{ unit.MonthlyRent }}</td>
-                            <td>{{ unit.squareFootage }} sq.ft</td>
+                            <td>{{ unit.squareFootage }}</td>
                             <td>{{ unit.AvailableDateForMoveIn }}</td>
                             <td>
                                 <form action="/unfavorite/{{ unit.UnitRentID }}" method="post">

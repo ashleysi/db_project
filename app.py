@@ -11,8 +11,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='Database',
-    db='Roomio2',
+    password='083723',
+    db='Roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -22,7 +22,7 @@ def homepage():
     return render_template('index.html')
 
 def get_db_connection():
-    return pymysql.connect(host='127.0.0.1', user='root', password='Database', db='Roomio2', cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(host='127.0.0.1', user='root', password='083723', db='Roomio', cursorclass=pymysql.cursors.DictCursor)
 
 @app.template_filter()
 def format_currency(value):
@@ -100,54 +100,19 @@ def home():
         return redirect(url_for('login'))
     return render_template('home.html', username=user)
 
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    session.clear()
+    return redirect('/')
 
-@app.route('/pet_register', methods=['GET', 'POST'])
-def pet_register():
-    user = session['username']
-    return render_template('pet_register.html', username=user)  
-
-
-@app.route('/registerPet', methods=['GET', 'POST'])
-def register_pet():
-    if request.method == 'POST':
-        pet_name = request.form['pet_name']
-        pet_type = request.form['pet_type']
-        pet_size = request.form['pet_size']
-        owner_username = session['username']
-
-        cursor = conn.cursor()
-
-        # Check if the pet already exists 
-        query = 'SELECT * FROM Pets WHERE PetName = %s AND username = %s'
-        cursor.execute(query, (pet_name, owner_username))
-        data = cursor.fetchone()
-
-        if data:
-            error = 'This pet already exists'
-            cursor.close()
-            return render_template('registerPet.html', error=error)
-        else:
-            ins = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
-            cursor.execute(ins, (pet_name, pet_type, pet_size, owner_username))
-            conn.commit()
-            cursor.close()
-            return render_template('registerPet.html', message='Pet registered successfully!')
-    else:
-        return render_template('registerPet.html')
-
-
-@app.route('/registerPet')
-def registered_pet():
-    owner_username = session.get('username')  # Get the logged-in user's username from the session
-    cursor = conn.cursor()
-    query = 'SELECT PetName, PetType, PetSize FROM Pets WHERE username = %s'
-    cursor.execute(query, (owner_username,))
-    pets = cursor.fetchall()  # Fetch all pets for the logged-in user
-    cursor.close()
-    return render_template('registeredPet.html', pets=pets)
 
 @app.route('/edit_pet', methods=['GET', 'POST'])
 def edit_pet():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Redirect to login if no user is logged in
+
+    conn = get_db_connection()
     if request.method == 'POST':
         pet_name_type = request.form['pet']
         new_pet_size = request.form['new_pet_size']
@@ -160,15 +125,98 @@ def edit_pet():
         cursor.execute(query, (new_pet_size, pet_name, pet_type, owner_username))
         conn.commit()
         cursor.close()
-        return redirect(url_for('registered_pet'))
     else:
-        owner_username = session.get('username') 
+        owner_username = session.get('username')
         cursor = conn.cursor()
-        query = 'SELECT PetName, PetType FROM Pets WHERE username = %s'
+        query = 'SELECT PetName, PetType, PetSize FROM Pets WHERE username = %s'
         cursor.execute(query, (owner_username,))
         pets = cursor.fetchall()
         cursor.close()
-        return render_template('edit_pet.html', pets=pets)
+
+    conn.close()
+    return render_template('edit_pet.html', pets=pets)
+
+@app.route('/edit_pet_detail', methods=['GET', 'POST'])
+def edit_pet_detail():
+    conn = get_db_connection()
+    if request.method == 'POST':
+        # Handle form submission
+        pet_name = request.form['pet_name']
+        pet_type = request.form['pet_type']
+        new_pet_size = request.form['pet_size']
+        original_pet_name = request.args.get('pet_name')
+        original_pet_type = request.args.get('pet_type')
+
+        # Update the pet details in the database
+        query = '''
+            UPDATE Pets
+            SET PetName = %s, PetType = %s, PetSize = %s
+            WHERE PetName = %s AND PetType = %s AND username = %s
+        '''
+        cursor = conn.cursor()
+        cursor.execute(query, (pet_name, pet_type, new_pet_size, original_pet_name, original_pet_type, session['username']))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('edit_pet'))
+
+    # If not POST, then it's a GET request: fetch the pet's current details
+    pet_name = request.args.get('pet_name')
+    pet_type = request.args.get('pet_type')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Pets WHERE PetName = %s AND PetType = %s AND username = %s',
+                   (pet_name, pet_type, session['username']))
+    pet = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if pet is None:
+        return "Pet not found", 404
+
+    return render_template('edit_pet_detail.html', pet=pet)
+
+@app.route('/add_pet', methods=['GET', 'POST'])
+def add_pet():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        pet_name = request.form['pet_name']
+        pet_type = request.form['pet_type']
+        pet_size = request.form['pet_size']
+        username = session['username']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
+        cursor.execute(query, (pet_name, pet_type, pet_size, username))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('edit_pet'))
+
+    return render_template('add_pet.html')
+
+@app.route('/delete_pet', methods=['POST'])
+def delete_pet():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Ensure user is logged in
+
+    pet_name = request.form['pet_name']
+    pet_type = request.form['pet_type']
+    username = session['username']
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = 'DELETE FROM Pets WHERE PetName = %s AND PetType = %s AND username = %s'
+    cursor.execute(query, (pet_name, pet_type, username))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return redirect(url_for('edit_pet'))
+
 
 @app.route('/user_pets')
 def user_pets():
@@ -225,19 +273,24 @@ def search2_results():
 
 @app.route('/view/units')
 def view_units():
+    if 'username' not in session:
+        return 'Please log in to view this page', 401  # Redirect or handle not logged in users
+
+    username = session['username']  # Retrieve the logged-in user's username
     conn = get_db_connection()
     company_name = request.args.get('companyName')
     building_name = request.args.get('buildingName')
 
     cursor = conn.cursor()
     query = """
-        SELECT * FROM ApartmentUnit
+        SELECT ApartmentUnit.*, 
+               IF(EXISTS(SELECT 1 FROM Favorite WHERE Favorite.UnitRentID = ApartmentUnit.UnitRentID AND Favorite.Username = %s), 1, 0) AS IsFavorited
+        FROM ApartmentUnit
         WHERE CompanyName = %s AND BuildingName = %s
     """
-    cursor.execute(query, (company_name, building_name))
+    cursor.execute(query, (username, company_name, building_name))
     units = cursor.fetchall()
     cursor.close()
-    conn.close()
 
     return render_template('view_units.html', units=units, company_name=company_name, building_name=building_name)
 
