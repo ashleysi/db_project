@@ -21,6 +21,7 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
 - **Register Pet**:
   - Users can register pets associated with their accounts.
   - Users can edit information of registered pets.
+  - Users can view their pets and all assosciated information
 
 - **Estimate Monthly Rent**:
   - Users can input a zipcode and the number of rooms.
