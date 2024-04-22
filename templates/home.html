@@ -6,9 +6,9 @@
 <title>Home Page</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background-color: #333; 
-    color: #fff; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* More modern font */
+    background-color: #20232a; /* Darker gray background */
+    color: #61dafb; /* Light blue color, similar to React blue for better visibility */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,50 +16,59 @@
     margin: 0;
   }
   .form-container {
-    background-color: #444; 
+    width: 90%;
+    max-width: 600px; /* Limit max width for better form control */
+    background-color: #282c34; /* Dark background for the form */
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+    border-radius: 8px; /* Smoother border radius */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
   .button-group {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns for better spacing */
     gap: 10px; 
-    padding-top: 10px; 
   }
   .blue-btn {
-    flex: 1; 
-    padding: 10px;
+    padding: 12px 0; /* More padding for bigger button */
     border: none;
-    border-radius: 3px;
+    border-radius: 5px; /* Rounded borders */
     cursor: pointer;
     font-weight: bold;
-    color: #fff; 
-    background-color: #007bff; 
+    color: #ffffff; 
+    background-color: #007bff; /* Blue background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+  }
+  .blue-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Larger shadow on hover */
   }
   .welcome-message {
-            position: absolute; /* Absolute positioning */
-            top: 0; /* Zero distance from the top */
-            left: 0; /* Zero distance from the left */
-            padding: 10px; /* Padding around text */
-            font-size: 24px; /* Larger font size */
-            border-bottom-right-radius: 10px; /* Rounded corner on the bottom right */
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    font-size: 18px; /* Slightly reduced font size */
+    background-color: #282c34; /* Background to match form */
+    color: #61dafb; /* Light blue text */
+    border-bottom-right-radius: 8px; /* Matching rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for depth */
   }
 </style>
-<div class="welcome-message">Welcome, {{ username }}!</div>
 </head>
 <body>
+<div class="welcome-message">Welcome, {{ username }}!</div>
 <div class="form-container">
     <div class="button-group">
       <button type="button" class="blue-btn" onclick="location.href='/user_pets'">My Pets</button>
       <button type="button" class="blue-btn" onclick="location.href='/pet_register'">Register a Pet</button>
       <button type="button" class="blue-btn" onclick="location.href='/edit_pet'">Edit a Pet</button>
-      <button type="button" class="blue-btn" onclick="location.href='/search'">Search Apartments</button>
-      <button type="button" class="blue-btn" onclick="location.href='/search2'">Search Apartments 2.0</button>
-       
+      <button type="button" class="blue-btn" onclick="location.href='/favorites'">Favorites</button>
+      <button type="button" class="blue-btn" onclick="location.href='/search2'">Search Apartments</button>
+      <button type="button" class="blue-btn" onclick="location.href='/estimate'">Estimate Monthly Rent</button>
     </div>
 </div>
 </body>

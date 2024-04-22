@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #444;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 2px solid #999; /* Thicker and lighter border for better visibility */
+            border-right: 2px solid #999; /* Maintain uniform style for both vertical and horizontal separators */
+            text-align: left;
+        }
+        th:last-child, td:last-child {
+            border-right: none; /* Remove right border from the last column */
+        }
+        th {
+            background-color: #555;
+        }
+        a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: bold;
+            align-self: flex-start;
+            margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background-color: #666;
+        }
+        a:hover {
+            background-color: #777;
+        }
+        button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background: linear-gradient(to right, #007bff, #6699ff); /* Gradient background */
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        outline: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease; /* Smooth transition for hover effect */
+    }
+    button:hover {
+        background: linear-gradient(to right, #0056b3, #337ab7);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px); /* Slight raise */
+    }
+    button:active {
+        transform: translateY(1px); /* Mimics button press */
+    }
+    .unfavorite-button {
+            background-color: #ff3333; /* Red background color */
+            color: #ffffff; /* White text color */
+        }
+    </style>    
+</head>
+<body>
+    <div class="form-container">
+        <h1>Units in {{ company_name }}, {{ building_name }}</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Unit Rent ID</th>
+                    <th>Unit Number</th>
+                    <th>Monthly Rent</th>
+                    <th>Square Footage</th>
+                    <th>Available Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for unit in units %}
+                <tr>
+                    <td>{{ unit.UnitRentID }}</td>
+                    <td>{{ unit.unitNumber }}</td>
+                    <td>{{ unit.MonthlyRent | format_currency }}</td>
+                    <td>{{ unit.squareFootage }}</td>
+                    <td>{{ unit.AvailableDateForMoveIn.strftime('%Y-%m-%d') }}</td>
+                    <td><button onclick="toggleFavorite(this, {{ unit.UnitRentID }})">Favorite</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/search2">Back to Search</a>
+    </div>
+    <script>
+        function toggleFavorite(button, unitRentID) {
+            // Toggle button text
+            if (button.textContent === "Favorite") {
+                button.textContent = "Unfavorite";
+                button.classList.add("unfavorite-button"); // Add CSS class
+                // Call function to add unit to favorites
+                addToFavorites(unitRentID);
+            } else {
+                button.textContent = "Favorite";
+                button.classList.remove("unfavorite-button"); // Remove CSS class
+                // Call function to remove unit from favorites
+                removeFromFavorites(unitRentID);
+            }
+        }
+
+        function addToFavorites(unitRentID) {
+        fetch('/add_to_favorites', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ unit_rent_id: unitRentID })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function removeFromFavorites(unitRentID) {
+    fetch('/unfavorite/' + unitRentID, {  // Include unitRentID in the URL
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => console.error('Error:', error));
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Estimate Rent</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #282c34;
+            color: #abb2bf;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            background-color: #3a3f4b;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 350px; /* Adjust width as necessary */
+            margin-right: 40px; /* Space between the containers */
+        }
+        select, button {
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            background-color: #4b5364;
+            color: #c6c8d1;
+            border-radius: 5px;
+            width: 100%; /* Ensures all form elements are the same width */
+            transition: background-color 0.3s ease;
+        }
+        select:hover, button:hover {
+            background-color: #616a7f;
+        }
+        button {
+            font-weight: bold;
+            cursor: pointer;
+            padding: 12px 20px;
+        }
+        label {
+            color: #c6c8d1;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #61dafb;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            font-size: 16px;
+            color: #98c379;
+            margin-top: 20px;
+        }
+        span#averageRent {
+            font-weight: bold;
+            color: #e06c75;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #666; /* Lighter than body for visibility */
+            color: #fff; /* Text color */
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background-color: #777;
+        }
+        .units-table-container {
+    margin-top: 20px;
+    overflow-x: auto;  /* Enables horizontal scrolling on smaller screens */
+    background-color: #3a3f4b;  /* Consistent with form container */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    float: right;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid #4b5364;
+}
+
+th {
+    background-color: #4b5364;
+    color: #fff;
+}
+
+td {
+    background-color: #555;
+    color: #ddd;
+}
+
+th:last-child, td:last-child {
+    border-right: none;
+}
+
+tr:hover {
+    background-color: #616a7f;  /* Adds interactivity by highlighting row on hover */
+}
+
+    </style>
+</head>
+<body>
+    <a href="/home" class="back-btn">&lt; Back</a>
+    <div class="form-container">
+        <h1>Estimate Monthly Rent</h1>
+        <form id="estimateForm">
+            <label for="zipcode">Zipcode:</label>
+            <select id="zipcode" name="zipcode">
+                <!-- Zip codes will be loaded here -->
+            </select>
+            <label for="bedrooms">Number of Bedrooms:</label>
+            <select name="bedrooms">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <label for="bathrooms">Number of Bathrooms:</label>
+            <select name="bathrooms">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <button type="button" onclick="calculateAverage()">Calculate</button>
+        </form>
+        <h2>Average Monthly Rent: <span id="averageRent">$0</span></h2>
+    </div>
+    <div class="units-table-container">
+        <h2>Matching Units:</h2>
+        <table id="unitsTable">
+            <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Unit Number</th>
+                    <th>Monthly Rent</th>
+                    <th>Square Footage</th>
+                    <th>Available Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Units data will be filled here -->
+            </tbody>
+        </table>
+    </div>
+    
+
+    <script>
+        window.onload = function() {
+            fetch('/get-zipcodes')
+                .then(response => response.json())
+                .then(data => {
+                    const zipcodeSelect = document.getElementById('zipcode');
+                    data.forEach(zipcode => {
+                        const option = document.createElement('option');
+                        option.value = zipcode;
+                        option.textContent = zipcode;
+                        zipcodeSelect.appendChild(option);
+                    });
+                });
+
+            document.getElementById('estimateForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                calculateAverage();
+            });
+        };
+
+        function calculateAverage() {
+    const formData = new FormData(document.getElementById('estimateForm'));
+    fetch('/calculate-average', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('averageRent').textContent = `$${parseFloat(data.averageRent).toFixed(2)}`;
+        fetch('/fetch-units', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(units => {
+            const unitsTableBody = document.getElementById('unitsTable').getElementsByTagName('tbody')[0];
+            unitsTableBody.innerHTML = ''; // Clear existing rows
+            units.forEach(unit => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${unit.UnitRentID}</td>
+                    <td>${unit.unitNumber}</td>
+                    <td>$${unit.MonthlyRent}</td>
+                    <td>${unit.squareFootage}</td>
+                    <td>${new Date(unit.AvailableDateForMoveIn).toLocaleDateString()}</td>
+                `;
+                unitsTableBody.appendChild(tr);
+            });
+        });
+    });
+}
+
+    </script>
+</body>
+</html

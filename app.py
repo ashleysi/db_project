@@ -21,6 +21,13 @@ conn = pymysql.connect(
 def homepage():
     return render_template('index.html')
 
+def get_db_connection():
+    return pymysql.connect(host='127.0.0.1', user='root', password='Database', db='Roomio2', cursorclass=pymysql.cursors.DictCursor)
+
+@app.template_filter()
+def format_currency(value):
+    return f"${value:,.2f}"
+
 @app.route('/register')
 def register():
     return render_template('register.html')
@@ -179,28 +186,196 @@ def search2():
 
 @app.route('/search2_results', methods=['POST'])
 def search2_results():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
     state = request.form.get('state')
     city = request.form.get('city')
     zipCode = request.form.get('zipCode')
     yearBuilt = request.form.get('yearBuilt')
+    
+    # Start with the base query
     query = 'SELECT * FROM ApartmentBuilding'
-    
-    if state != '':
-        query += f" AND AddrState = '{state}'"
-    if city != '':
-        query += f" AND AddrCity = '{city}'"
-    if zipCode != '':
-        query += f" AND AddrZipCode = '{zipCode}'"
-    if yearBuilt != '':
-        query += f" AND YearBuilt = '{yearBuilt}'"
-    
+
+    # List to hold the conditions
+    conditions = []
+
+    if state:
+        conditions.append(f"AddrState = '{state}'")
+    if city:
+        conditions.append(f"AddrCity = '{city}'")
+    if zipCode:
+        conditions.append(f"AddrZipCode = '{zipCode}'")
+    if yearBuilt:
+        conditions.append(f"YearBuilt = {yearBuilt}")
+
+    # Only add WHERE clause if there are conditions
+    if conditions:
+        query += ' WHERE ' + ' AND '.join(conditions)
+
+    try:
+        cursor.execute(query)
+        result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        print("Error executing query:", e)
+        return jsonify({"error": str(e)})
+    finally:
+        cursor.close()
+
+@app.route('/view/units')
+def view_units():
+    conn = get_db_connection()
+    company_name = request.args.get('companyName')
+    building_name = request.args.get('buildingName')
+
     cursor = conn.cursor()
-    cursor.execute(query)
-    result = cursor.fetchall()
+    query = """
+        SELECT * FROM ApartmentUnit
+        WHERE CompanyName = %s AND BuildingName = %s
+    """
+    cursor.execute(query, (company_name, building_name))
+    units = cursor.fetchall()
     cursor.close()
     conn.close()
 
-    return jsonify(result)
+    return render_template('view_units.html', units=units, company_name=company_name, building_name=building_name)
+
+@app.route('/estimate')
+def estimate():
+    return render_template('estimate.html')
+
+@app.route('/get-zipcodes')
+def get_zipcodes():
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('SELECT DISTINCT AddrZipCode FROM ApartmentBuilding')
+            zipcodes = cursor.fetchall()
+            return jsonify([zipcode['AddrZipCode'] for zipcode in zipcodes])
+    finally:
+        conn.close()
+
+@app.route('/calculate-average', methods=['POST'])
+def calculate_average():
+    zipcode = request.form['zipcode']
+    bedrooms = int(request.form['bedrooms'])
+    bathrooms = int(request.form['bathrooms'])
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            query = """
+            SELECT AVG(U.MonthlyRent) AS AverageRent
+            FROM ApartmentUnit U
+            JOIN ApartmentBuilding B ON U.CompanyName = B.CompanyName AND U.BuildingName = B.BuildingName
+            WHERE B.AddrZipCode = %s
+            AND (
+                SELECT COUNT(*)
+                FROM Rooms R
+                WHERE R.UnitRentID = U.UnitRentID AND R.name LIKE 'bedroom%%'
+            ) = %s
+            AND (
+                SELECT COUNT(*)
+                FROM Rooms R
+                WHERE R.UnitRentID = U.UnitRentID AND R.name LIKE 'bathroom%%'
+            ) = %s
+            """
+            cursor.execute(query, (zipcode, bedrooms, bathrooms))
+            result = cursor.fetchone()
+            average_rent = result['AverageRent'] if result['AverageRent'] else 0
+            print("Average rent calculated:", average_rent)
+            return jsonify({'averageRent': result['AverageRent'] if result['AverageRent'] else 0})
+    finally:
+        conn.close()
+
+@app.route('/fetch-units', methods=['POST'])
+def fetch_units():
+    zipcode = request.form['zipcode']
+    bedrooms = int(request.form['bedrooms'])
+    bathrooms = int(request.form['bathrooms'])
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            query = """
+            SELECT U.UnitRentID, U.unitNumber, U.MonthlyRent, U.squareFootage, U.AvailableDateForMoveIn
+            FROM ApartmentUnit U
+            JOIN ApartmentBuilding B ON U.CompanyName = B.CompanyName AND U.BuildingName = B.BuildingName
+            WHERE B.AddrZipCode = %s
+            AND (
+                SELECT COUNT(*)
+                FROM Rooms R
+                WHERE R.UnitRentID = U.UnitRentID AND R.name LIKE 'bedroom%%'
+            ) = %s
+            AND (
+                SELECT COUNT(*)
+                FROM Rooms R
+                WHERE R.UnitRentID = U.UnitRentID AND R.name LIKE 'bathroom%%'
+            ) = %s
+            """
+            cursor.execute(query, (zipcode, bedrooms, bathrooms))
+            units = cursor.fetchall()
+            return jsonify(units)
+    finally:
+        conn.close()
+
+@app.route('/add_to_favorites', methods=['POST'])
+def add_to_favorites():
+    if 'username' not in session:
+        return jsonify({"success": False, "message": "User not logged in"}), 401  # HTTP 401 for Unauthorized access
+
+    username = session['username']
+    unit_rent_id = request.json['unit_rent_id']
+
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO Favorite (Username, UnitRentID) VALUES (%s, %s)"
+            cursor.execute(sql, (username, unit_rent_id))
+        connection.commit()
+        return jsonify({"success": True, "message": "Added to favorites"})
+    except pymysql.err.IntegrityError as e:
+        connection.rollback()  # Rollback in case of error
+        return jsonify({"success": False, "message": "Could not add to favorites: " + str(e)})
+    finally:
+        connection.close()
+
+
+@app.route('/favorites')
+def favorites():
+    if 'username' not in session:
+        return 'Please log in to view this page.', 401  # HTTP 401 for Unauthorized access
+
+    username = session['username']
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = '''
+            SELECT ApartmentUnit.* FROM Favorite
+            JOIN ApartmentUnit ON Favorite.UnitRentID = ApartmentUnit.UnitRentID
+            WHERE Favorite.Username = %s
+            '''
+            cursor.execute(sql, (username,))
+            favorite_units = cursor.fetchall()
+            return render_template('favorites.html', favorite_units=favorite_units)
+    except Exception as e:
+        print("Error fetching favorite units:", e)
+        return render_template('favorites.html', favorite_units=None)
+    finally:
+        connection.close()
+
+
+@app.route('/unfavorite/<int:unit_id>', methods=['POST'])
+def unfavorite(unit_id):
+    cursor = conn.cursor()
+    try:
+        cursor.execute('DELETE FROM Favorite WHERE UnitRentID = %s', (unit_id,))
+        conn.commit()
+        return redirect(url_for('favorites'))
+    except Exception as e:
+        print("Error unfavorite unit:", e)
+        return redirect(url_for('favorites'))
+    finally:
+        cursor.close()
 
 @app.route('/search', methods = ['GET'])
 def search():

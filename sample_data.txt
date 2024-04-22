@@ -1,3 +1,13 @@
+CREATE TABLE Favorite (
+    FavoriteID INT AUTO_INCREMENT PRIMARY KEY,
+    Username VARCHAR(20) NOT NULL,
+    UnitRentID INT NOT NULL,
+    FOREIGN KEY (Username) REFERENCES Users(username),
+    FOREIGN KEY (UnitRentID) REFERENCES ApartmentUnit(UnitRentID),
+    UNIQUE (Username, UnitRentID)
+);
+
+
 INSERT INTO Users (username, first_name, last_name, DOB, gender, email, Phone, passwd) VALUES ("aj25082","Amy","Jimenez","1968-12-12",1,"aj25082@nyu.edu","7412215748","$pbkdf2-sha256$29000$g1DKOUeoNQbA.H8vZawVwg$qa5XMq7NZcBdvZQ8P4jcpkgVqdbme.yse28m/GetUdM");
 INSERT INTO Users (username, first_name, last_name, DOB, gender, email, Phone, passwd) VALUES ("jm19012","John","Mckee","1994-05-22",1,"jm19012@nyu.edu","9537388605","$pbkdf2-sha256$29000$g1DKOUeoNQbA.H8vZawVwg$qa5XMq7NZcBdvZQ8P4jcpkgVqdbme.yse28m/GetUdM");
 INSERT INTO Users (username, first_name, last_name, DOB, gender, email, Phone, passwd) VALUES ("ns37480","Nathan","Sutton","1999-12-18",2,"ns37480@nyu.edu","8908655198","$pbkdf2-sha256$29000$g1DKOUeoNQbA.H8vZawVwg$qa5XMq7NZcBdvZQ8P4jcpkgVqdbme.yse28m/GetUdM");
