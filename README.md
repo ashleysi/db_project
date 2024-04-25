@@ -30,10 +30,11 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
 - **Favorite**:
   - Users can add units to their favorites for quick access.
 
-### 🚧 Work In Progress
-
-- **Display Unit and Building Info**:
+  - **Display Unit and Building Info**:
   - Search and display detailed information about buildings and units.
+  - View pet policies for every unit
+
+### 🚧 Work In Progress
 
 - **More Advanced Search of Units**:
   - Advanced search options including amenities and expected monthly rent.

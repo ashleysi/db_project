@@ -11,8 +11,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='083723',
-    db='Roomio',
+    password='Database',
+    db='Roomio2',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -22,7 +22,7 @@ def homepage():
     return render_template('index.html')
 
 def get_db_connection():
-    return pymysql.connect(host='127.0.0.1', user='root', password='083723', db='Roomio', cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(host='127.0.0.1', user='root', password='Database', db='Roomio2', cursorclass=pymysql.cursors.DictCursor)
 
 @app.template_filter()
 def format_currency(value):
@@ -283,16 +283,45 @@ def view_units():
 
     cursor = conn.cursor()
     query = """
-        SELECT ApartmentUnit.*, 
-               IF(EXISTS(SELECT 1 FROM Favorite WHERE Favorite.UnitRentID = ApartmentUnit.UnitRentID AND Favorite.Username = %s), 1, 0) AS IsFavorited
-        FROM ApartmentUnit
-        WHERE CompanyName = %s AND BuildingName = %s
+        SELECT AU.UnitRentID, AU.unitNumber, AU.MonthlyRent, AU.squareFootage, AU.AvailableDateForMoveIn,
+               IF(EXISTS(SELECT 1 FROM Favorite WHERE Favorite.UnitRentID = AU.UnitRentID AND Favorite.Username = %s), 1, 0) AS IsFavorited,
+               GROUP_CONCAT(DISTINCT CASE WHEN PP.PetType IS NULL THEN CONCAT(P.PetType, ' not allowed') ELSE NULL END SEPARATOR ', ') AS DisallowedPets
+        FROM ApartmentUnit AU
+        JOIN ApartmentBuilding AB ON AU.CompanyName = AB.CompanyName AND AU.BuildingName = AB.BuildingName
+        LEFT JOIN Pets P ON P.username = %s
+        LEFT JOIN PetPolicy PP ON AB.CompanyName = PP.CompanyName AND AB.BuildingName = PP.BuildingName AND PP.PetType = P.PetType AND PP.PetSize = P.PetSize AND PP.isAllowed = True
+        WHERE AU.CompanyName = %s AND AU.BuildingName = %s
+        GROUP BY AU.UnitRentID
     """
-    cursor.execute(query, (username, company_name, building_name))
+    cursor.execute(query, (username, username, company_name, building_name))
     units = cursor.fetchall()
     cursor.close()
+    conn.close()
 
     return render_template('view_units.html', units=units, company_name=company_name, building_name=building_name)
+
+@app.route('/view_pet_policy')
+def view_pet_policy():
+    unit_rent_id = request.args.get('unitRentID')
+    if not unit_rent_id:
+        return 'No unit specified', 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = """
+        SELECT PP.PetType, PP.PetSize, PP.isAllowed, PP.RegistrationFee, PP.MonthlyFee
+        FROM PetPolicy PP
+        JOIN ApartmentUnit AU ON PP.CompanyName = AU.CompanyName AND PP.BuildingName = AU.BuildingName
+        WHERE AU.UnitRentID = %s
+    """
+    cursor.execute(query, (unit_rent_id,))
+    pet_policies = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template('view_pet_policy.html', pet_policies=pet_policies, unit_rent_id=unit_rent_id)
+
+
 
 @app.route('/estimate')
 def estimate():
