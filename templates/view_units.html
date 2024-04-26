@@ -111,7 +111,6 @@
                     <th>Available Date</th>
                     <th>Pets Allowed</th>
                     <th>Action</th>
-                    <th>Pet Policy</th> <!-- New Header for Pet Policy -->
                 </tr>
             </thead>
             <tbody>
@@ -122,21 +121,12 @@
                     <td>{{ unit.MonthlyRent | format_currency }}</td>
                     <td>{{ unit.squareFootage }}</td>
                     <td>{{ unit.AvailableDateForMoveIn.strftime('%Y-%m-%d') }}</td>
-                    <td>
-                        {% if unit.DisallowedPets %}
-                            {{ unit.DisallowedPets }}
-                        {% else %}
-                            Yes
-                        {% endif %}
-                    </td>
+                    <td>{{ 'Yes' if not unit.DisallowedPets else unit.DisallowedPets }}</td>
                     <td>
                         <button onclick="toggleFavorite(this, {{ unit.UnitRentID }}, {{ unit.IsFavorited }})"
                                 class="{{ 'unfavorite-button' if unit.IsFavorited else '' }}">
                             {{ 'Unfavorite' if unit.IsFavorited else 'Favorite' }}
                         </button>
-                    </td>
-                    <td>
-                        <button class="view-policy-btn" onclick="window.location.href='/view_pet_policy?unitRentID={{ unit.UnitRentID }}'">View Pet Policy</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -148,17 +138,15 @@
     <script>
         function toggleFavorite(button, unitRentID, isFavorited) {
             if (isFavorited) {
-                // Change to favorite
                 button.textContent = "Favorite";
                 button.classList.remove("unfavorite-button");
                 removeFromFavorites(unitRentID);
-            } else {
-                // Change to unfavorite
+            } 
+            else {
                 button.textContent = "Unfavorite";
                 button.classList.add("unfavorite-button");
                 addToFavorites(unitRentID);
             }
-            // Update the onclick to toggle the state back on next click
             button.setAttribute('onclick', `toggleFavorite(this, ${unitRentID}, ${!isFavorited})`);
         }
 
@@ -190,7 +178,6 @@
     })
     .catch(error => console.error('Error:', error));
     }
-
     </script>
 </body>
 </html>

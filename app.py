@@ -282,23 +282,24 @@ def view_units():
     building_name = request.args.get('buildingName')
 
     cursor = conn.cursor()
+    # Fetch unit details and interests
     query = """
         SELECT AU.UnitRentID, AU.unitNumber, AU.MonthlyRent, AU.squareFootage, AU.AvailableDateForMoveIn,
                IF(EXISTS(SELECT 1 FROM Favorite WHERE Favorite.UnitRentID = AU.UnitRentID AND Favorite.Username = %s), 1, 0) AS IsFavorited,
-               GROUP_CONCAT(DISTINCT CASE WHEN PP.PetType IS NULL THEN CONCAT(P.PetType, ' not allowed') ELSE NULL END SEPARATOR ', ') AS DisallowedPets
+               GROUP_CONCAT(DISTINCT CONCAT(U.first_name, ' ', U.last_name, ': ', I.RoommateCnt, ' roommates, moving in on ', I.MoveInDate) ORDER BY I.MoveInDate DESC SEPARATOR '; ') AS Interests
         FROM ApartmentUnit AU
-        JOIN ApartmentBuilding AB ON AU.CompanyName = AB.CompanyName AND AU.BuildingName = AB.BuildingName
-        LEFT JOIN Pets P ON P.username = %s
-        LEFT JOIN PetPolicy PP ON AB.CompanyName = PP.CompanyName AND AB.BuildingName = PP.BuildingName AND PP.PetType = P.PetType AND PP.PetSize = P.PetSize AND PP.isAllowed = True
+        LEFT JOIN Interests I ON AU.UnitRentID = I.UnitRentID
+        LEFT JOIN Users U ON I.username = U.username
         WHERE AU.CompanyName = %s AND AU.BuildingName = %s
         GROUP BY AU.UnitRentID
     """
-    cursor.execute(query, (username, username, company_name, building_name))
+    cursor.execute(query, (username, company_name, building_name))
     units = cursor.fetchall()
     cursor.close()
     conn.close()
 
     return render_template('view_units.html', units=units, company_name=company_name, building_name=building_name)
+
 
 @app.route('/view_pet_policy')
 def view_pet_policy():
@@ -532,10 +533,6 @@ def search():
 
 
         cursor.close()
-            
-        #return render_template('search.html', user=user)
-
-        #return render_template('search.html', user=user, units=units)
 
         return render_template('search.html', user=user, units=units,
                                company_name=company_name, building_name=building_name, pet_y_n=pet_y_n,
