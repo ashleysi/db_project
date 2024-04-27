@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Policies for Unit {{ unit_rent_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #444;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 2px solid #999; /* Thicker and lighter border for better visibility */
+            border-right: 2px solid #999; /* Maintain uniform style for both vertical and horizontal separators */
+            text-align: left;
+        }
+        th:last-child, td:last-child {
+            border-right: none; /* Remove right border from the last column */
+        }
+        th {
+            background-color: #555;
+        }
+        a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: bold;
+            align-self: flex-start;
+            margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            background-color: #666;
+        }
+        a:hover {
+            background-color: #777;
+        }
+        .view-policy-btn {
+            padding: 5px 10px;
+            background-color: #4CAF50; /* Green background */
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .view-policy-btn:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+    </style>    
+</head>
+<body>
+    <div class="form-container">
+        <h1>Pet Policies for Unit {{ unit_rent_id }}</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pet Type</th>
+                    <th>Pet Size</th>
+                    <th>Allowed</th>
+                    <th>Registration Fee</th>
+                    <th>Monthly Fee</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for policy in pet_policies %}
+                <tr>
+                    <td>{{ policy.PetType }}</td>
+                    <td>{{ policy.PetSize }}</td>
+                    <td>{{ 'Yes' if policy.isAllowed else 'No' }}</td>
+                    <td>${{ policy.RegistrationFee }}</td>
+                    <td>${{ policy.MonthlyFee }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/search2">Back to Search</a>
+    </div>
+</body>
+</html>

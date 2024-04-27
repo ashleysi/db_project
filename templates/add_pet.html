@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Pet</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; /* Modern sans-serif font */
+            background-color: #282c34; /* Dark gray background for modern look */
+            color: #61dafb; /* Soft blue for good contrast on dark background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #20232a; /* Slightly darker background for the form */
+            padding: 20px;
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+            width: 100%;
+            max-width: 400px; /* Maximum width */
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px; /* Spacing between label and input */
+            font-size: 16px; /* Larger font size for readability */
+        }
+        input[type="text"], select {
+            padding: 10px; /* Padding for comfort */
+            margin-bottom: 20px; /* Space between form elements */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners for inputs */
+            background: #333; /* Darker elements background */
+            color: #fff; /* White text color */
+        }
+        button {
+            padding: 12px;
+            background-color: #61dafb; /* Matching the text color theme */
+            color: #20232a; /* Dark text for button */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
+        }
+        button:hover {
+            background-color: #4b8fb2; /* Darker blue on hover */
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #666; /* Lighter than body for visibility */
+            color: #fff; /* Text color */
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background-color: #777;
+        }
+    </style>
+</head>
+<body>
+    <a href="/edit_pet" class="back-btn">&lt; Back</a>
+    <div class="container">
+        <h1>Add New Pet</h1>
+        <form action="/add_pet" method="POST">
+            <label for="pet_name">Pet Name:</label>
+            <input type="text" id="pet_name" name="pet_name" required>
+            
+            <label for="pet_type">Pet Type:</label>
+            <input type="text" id="pet_type" name="pet_type" required>
+            
+            <label for="pet_size">Pet Size:</label>
+            <select id="pet_size" name="pet_size" required>
+                <option value="Small">Small</option>
+                <option value="Medium">Medium</option>
+                <option value="Large">Large</option>
+            </select>
+
+            <button type="submit" class="add-btn">Add</button>
+        </form>
+    </div>
+</body>
+</html>

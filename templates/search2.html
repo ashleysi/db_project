@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Buildings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #444;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        input[type="text"], input[type="number"] {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #555;
+            background-color: #555;
+            color: #fff;
+            border-radius: 3px;
+        }
+        input::placeholder {
+            color: #bbb;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-right: 2px solid #999;
+        }
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+        td:not(:last-child) {
+            border-bottom: 2px solid #999; /* Apply bottom border to all but the last cell */
+        }
+        th {
+            background-color: #555;
+            border-bottom: 2px solid #999; /* Apply to headers as well */
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #666; /* Lighter than body for visibility */
+            color: #fff; /* Text color */
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background-color: #777;
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <a href="/home" class="back-btn">&lt; Back</a>
+    <div class="form-container">
+        <form id="searchForm">
+            <input type="text" id="state" name="state" placeholder="State">
+            <input type="text" id="city" name="city" placeholder="City">
+            <input type="text" id="zipCode" name="zipCode" placeholder="Zip Code">
+            <input type="number" id="yearBuilt" name="yearBuilt" placeholder="Year Built">
+            <button type="button" onclick="fetchData()">Search</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company Name</th>
+                    <th>Building Name</th>
+                    <th>Address Number</th>
+                    <th>Address Street</th>
+                    <th>Address City</th>
+                    <th>Address State</th>
+                    <th>Zip Code</th>
+                    <th>Year Built</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Results will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function fetchData() {
+            const formData = new FormData(document.getElementById('searchForm'));
+            fetch('/search2_results', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = ''; // Clear existing rows
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+    
+                    // Explicitly defining the order of columns
+                    tr.appendChild(createCell(row.CompanyName));
+                    tr.appendChild(createCell(row.BuildingName));
+                    tr.appendChild(createCell(row.AddrNum));
+                    tr.appendChild(createCell(row.AddrStreet));
+                    tr.appendChild(createCell(row.AddrCity));
+                    tr.appendChild(createCell(row.AddrState));
+                    tr.appendChild(createCell(row.AddrZipCode));
+                    tr.appendChild(createCell(row.YearBuilt));
+    
+                    // Add View Units button
+                    const viewButton = document.createElement('button');
+                    viewButton.textContent = 'View Units';
+                    viewButton.onclick = function() {
+                        window.location.href = `/view/units?companyName=${encodeURIComponent(row.CompanyName)}&buildingName=${encodeURIComponent(row.BuildingName)}`;
+                    };
+                    const buttonTd = document.createElement('td');
+                    buttonTd.appendChild(viewButton);
+                    tr.appendChild(buttonTd);
+    
+                    tableBody.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        function createCell(text) {
+            const td = document.createElement('td');
+            td.textContent = text;
+            return td;
+        }
+
+        window.onload = fetchData;
+    </script>
+    
+    
+</body>
+</html>

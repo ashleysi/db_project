@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Units</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #282c34;
+            color: #abb2bf;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .favorites-container {
+            background-color: #3a3f4b;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            width: 800px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #abb2bf;
+            text-align: left;
+        }
+        th {
+            background-color: #282c34;
+            color: #fff;
+        }
+        td {
+            background-color: #3a3f4b;
+            color: #abb2bf;
+        }
+        .no-favorites {
+            text-align: center;
+            font-style: italic;
+            color: #f00; /* Red color */
+        }
+        .unfavorite-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            background-color: #dc3545; /* Red color */
+        }
+        .unfavorite-button:hover {
+            background-color: #c82333; /* Darker red color on hover */
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #666; /* Lighter than body for visibility */
+            color: #fff; /* Text color */
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background-color: #777;
+        }
+    </style>
+</head>
+<body>
+    <a href="/home" class="back-btn">&lt; Back</a>
+    <div class="favorites-container">
+        <h1>Favorite Units</h1>
+        {% if favorite_units %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Unit Number</th>
+                        <th>Monthly Rent</th>
+                        <th>Square Footage</th>
+                        <th>Available Move-In Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unit in favorite_units %}
+                        <tr>
+                            <td>{{ unit.unitNumber }}</td>
+                            <td>${{ unit.MonthlyRent }}</td>
+                            <td>{{ unit.squareFootage }}</td>
+                            <td>{{ unit.AvailableDateForMoveIn }}</td>
+                            <td>
+                                <form action="/unfavorite/{{ unit.UnitRentID }}" method="post">
+                                    <button type="submit" class="unfavorite-button">Unfavorite</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-favorites">No Current Favorites</p>
+        {% endif %}
+    </div>
+</body>
+</html>

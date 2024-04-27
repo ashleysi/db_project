@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Page</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* More modern font */
+    background-color: #20232a; /* Darker gray background */
+    color: #61dafb; /* Light blue color, similar to React blue for better visibility */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .form-container {
+    width: 90%;
+    max-width: 600px; /* Limit max width for better form control */
+    background-color: #282c34; /* Dark background for the form */
+    padding: 20px;
+    border-radius: 8px; /* Smoother border radius */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .button-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns for better spacing */
+    gap: 10px; 
+  }
+  .blue-btn {
+    padding: 12px 0; /* More padding for bigger button */
+    border: none;
+    border-radius: 5px; /* Rounded borders */
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff; 
+    background-color: #007bff; /* Blue background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
+  }
+  .blue-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Larger shadow on hover */
+  }
+  .welcome-message {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    font-size: 18px; /* Slightly reduced font size */
+    background-color: #282c34; /* Background to match form */
+    color: #61dafb; /* Light blue text */
+    border-bottom-right-radius: 8px; /* Matching rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  }
+  .logout-btn {
+    background-color: #d9534f; 
+  }
+  .logout-btn:hover {
+      background-color: #c9302c;
+  }
+</style>
+</head>
+<body>
+<div class="welcome-message">Welcome, {{ username }}!</div>
+<div class="form-container">
+    <div class="button-group">
+      <button type="button" class="blue-btn" onclick="location.href='/edit_pet'">My Pets</button>
+      <button type="button" class="blue-btn" onclick="location.href='/favorites'">Favorites</button>
+      <button type="button" class="blue-btn" onclick="location.href='/search2'">Search Apartments</button>
+      <button type="button" class="blue-btn" onclick="location.href='/estimate'">Estimate Monthly Rent</button>
+    </div>
+    <button type="button" class="blue-btn logout-btn" onclick="location.href='/logout'">Log Out</button>
+</div>
+</body>
+</html>
