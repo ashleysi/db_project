@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #333; /* Darker background */
-            color: #fff; /* Light text color for contrast */
+            background-color: #333; 
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,15 +17,15 @@
         }
 
         .container {
-            background-color: #444; /* Slightly lighter than body for contrast */
+            background-color: #444; 
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adjusted for darker theme */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 20px; /* Adds bottom margin for spacing */
+            margin-bottom: 20px;
         }
 
         ul {
@@ -48,7 +48,9 @@
         {% if pets %}
             <ul>
                 {% for pet in pets %}
-                    <li>{{ pet.PetName }} - {{ pet.PetType }}</li>
+                    <li>Name: {{ pet.PetName }} </li>
+                    <li>Type: {{ pet.PetType }} </li>
+                    <li></li>
                 {% endfor %}
             </ul>
         {% else %}
