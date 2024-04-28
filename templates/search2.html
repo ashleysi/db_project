@@ -94,8 +94,8 @@
     <div class="form-container">
         <form id="searchForm">
             <!-- City and State cannot have special characters or numbers-->
-            <input type="text" id="state" name="state" placeholder="State" oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '')">
-            <input type="text" id="city" name="city" placeholder="City" oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '')">
+            <input type="text" id="state" name="state" placeholder="State" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
+            <input type="text" id="city" name="city" placeholder="City" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
             <!-- Accept an input that only takes digits and is of length 5 exactly-->
             <input type="text" id="zipCode" name="zipCode" placeholder="Zip Code" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 5)"            >
             <!-- Accept an input that only take digits and is of length 4 exactly-->
