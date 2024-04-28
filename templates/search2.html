@@ -93,10 +93,14 @@
     <a href="/home" class="back-btn">&lt; Back</a>
     <div class="form-container">
         <form id="searchForm">
-            <input type="text" id="state" name="state" placeholder="State">
-            <input type="text" id="city" name="city" placeholder="City">
-            <input type="text" id="zipCode" name="zipCode" placeholder="Zip Code">
-            <input type="number" id="yearBuilt" name="yearBuilt" placeholder="Year Built">
+            <!-- City and State cannot have special characters or numbers-->
+            <input type="text" id="state" name="state" placeholder="State" oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '')">
+            <input type="text" id="city" name="city" placeholder="City" oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '')">
+            <!-- Accept an input that only takes digits and is of length 5 exactly-->
+            <input type="text" id="zipCode" name="zipCode" placeholder="Zip Code" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 5)"            >
+            <!-- Accept an input that only take digits and is of length 4 exactly-->
+            <input type="number" id="yearBuilt" name="yearBuilt" placeholder="Year Built" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 4)"
+            >
             <button type="button" onclick="fetchData()">Search</button>
         </form>
         <table>
