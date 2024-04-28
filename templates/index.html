@@ -70,7 +70,12 @@
 <h3>Finding an appartment has never been easier!</h3>
 <div class="form-container">
     {% if error %}
-            <div style="color: red;">{{ error }}</div>
+            <!-- The below line would work with {{ error }}
+            However, to prevent XSS we add {{ error | escape}} to 
+            ensure that all special characters are encoded. This will prevent them from 
+            being understoof as executable scripts
+            -->
+            <div style="color: red;">{{ error | escape}}</div>
     {% endif %}
     <form action="/loginAuth" method="POST">
         <input type="text" name="username" placeholder="Username" required>

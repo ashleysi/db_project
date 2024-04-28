@@ -40,7 +40,10 @@ def loginAuth():
     cursor = conn.cursor()
 
     # Query to get the stored hashed password for the given username
+    # This is a paramaterized query which prevent SQL injection because it treats the input as DATA not an executable
+    # This line takes the username as %s serving as the temporary placeholder
     query = 'SELECT passwd FROM Users WHERE username = %s'
+    # In this line, the actual username value from the database is used (must be a tuple even with only one parameter)
     cursor.execute(query, (username,))
 
     data = cursor.fetchone()
@@ -74,6 +77,18 @@ def registerAuth():
     phone = request.form['phone']
     password = request.form['pw']
     hashed_password = pbkdf2_sha256.hash(password)
+    
+    # Check to see if theres a special character from the user input on the registration page
+    def check_input(username, first_name, last_name, email, phone):
+        # If there's a special character return false (the input is not valid)
+        if not all (current_character.isalnum() or current_character.isspace() for current_character in [username, first_name, last_name]):
+            return False
+        return True
+
+    # Check to see if theres a special character from the user input on the registration page
+    if not check_input(username, first_name, last_name, email, phone):
+        input_error = "Username, first name and last name cannot have special characters."
+        return render_template('register.html', error=input_error)
 
     cursor = conn.cursor()
     query = 'SELECT * FROM Users WHERE username = %s'
