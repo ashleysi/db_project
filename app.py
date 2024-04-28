@@ -11,8 +11,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='Database',
-    db='Roomio2',
+    password='root',
+    db='roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -22,7 +22,7 @@ def homepage():
     return render_template('index.html')
 
 def get_db_connection():
-    return pymysql.connect(host='127.0.0.1', user='root', password='Database', db='Roomio2', cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(host='127.0.0.1', user='root', password='root', db='roomio', cursorclass=pymysql.cursors.DictCursor)
 
 @app.template_filter()
 def format_currency(value):

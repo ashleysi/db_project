@@ -7,60 +7,67 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    background-color: #333; /* Darker background */
-    color: #fff; /* Light text color for contrast */
+    background-color: #333; 
+    color: #fff;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 100vh;
     margin: 0;
   }
+  h1 {
+    font-weight: bold;
+    text-align: center; 
+  }
   .form-container {
-    background-color: #444; /* Slightly lighter than body for contrast */
+    background-color: #444; 
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adjusted for darker theme */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Increased space between form elements */
+    gap: 20px; 
   }
   input[type="text"], input[type="password"] {
-    box-sizing: border-box; /* Fixes the issue of elements extending out of the container */
+    box-sizing: border-box; 
     width: 100%;
     padding: 10px;
-    margin-bottom: 20px; /* Increases bottom margin for inputs */
-    border: 1px solid #555; /* Darker border */
-    background-color: #555; /* Darker input backgrounds */
-    color: #fff; /* Ensure text is light for readability */
+    margin-bottom: 20px; 
+    border: 1px solid #555;
+    background-color: #555; 
+    color: #fff; 
     border-radius: 3px;
   }
   input::placeholder {
-    color: #bbb; /* Lighter gray for better visibility */
+    color: #bbb; 
   }
   .button-group {
     display: flex;
     justify-content: space-between;
-    gap: 10px; /* Space between buttons */
-    padding-top: 10px; /* Adds padding on top for more space between inputs and buttons */
+    gap: 10px; 
+    padding-top: 10px; 
   }
   .login-btn, .register-btn {
-    flex: 1; /* Allows buttons to grow equally */
+    flex: 1;
     padding: 10px;
     border: none;
     border-radius: 3px;
     cursor: pointer;
     font-weight: bold;
-    color: #fff; /* Makes text inside the buttons white */
-    background-color: #007bff; /* Default color for login button */
-    margin-right: 10px; /* Adds spacing between the buttons */
+    color: #fff; 
+    background-color: #007bff; 
+    margin-right: 10px; 
   }
   .register-btn {
     background-color: #28a745;
-    margin-right: 0; /* Resets the margin for the last button */
+    margin-right: 0;
   }
 </style>
 </head>
 <body>
+<h1>ROOMIO</h1>
+<h3>Finding an appartment has never been easier!</h3>
 <div class="form-container">
     {% if error %}
             <div style="color: red;">{{ error }}</div>
