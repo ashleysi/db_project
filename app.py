@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, url_for, redirect, jsonify
 from passlib.hash import pbkdf2_sha256
 import pymysql.cursors
+import re
 
 app = Flask(__name__)
 
@@ -192,6 +193,11 @@ def edit_pet_detail():
 
 @app.route('/add_pet', methods=['GET', 'POST'])
 def add_pet():
+
+    def check_input(pet_name, pet_type):
+        regex = r'^[a-zA-Z\s]+$'
+        return bool(re.match(regex, pet_name)) and bool(re.match(regex, pet_type))
+
     if 'username' not in session:
         return redirect(url_for('login'))
 
@@ -200,6 +206,10 @@ def add_pet():
         pet_type = request.form['pet_type']
         pet_size = request.form['pet_size']
         username = session['username']
+        
+        if not check_input(pet_name, pet_type):
+            input_error = 'No special characters or numbers allowed.'
+            return render_template('add_pet.html', error=input_error)
 
         conn = get_db_connection()
         cursor = conn.cursor()

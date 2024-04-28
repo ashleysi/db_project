@@ -68,10 +68,34 @@
         }
     </style>
 </head>
+<!-- Check to make sure the add a pet only allows characters. No numbers or special characters-->
+<script>
+    function check_input() {
+        var petName = document.getElementById('pet_name').value;
+        var petType = document.getElementById('pet_type').value;
+
+        // Only accept characters and spaces 
+        var regex = /^[a-zA-Z\s]*$/;
+        
+        // If pet name or pet type does not match the regex requirments 
+        if (!regex.test(petName) || !regex.test(petType)) {
+            // The input is not valid
+            alert("No numbers or special characters allowed.");
+            return false;
+        }
+        return true;
+    }
+</script>
 <body>
     <a href="/edit_pet" class="back-btn">&lt; Back</a>
     <div class="container">
         <h1>Add New Pet</h1>
+        
+        <!-- Don't allow numbers or special characters-->
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
         <form action="/add_pet" method="POST">
             <label for="pet_name">Pet Name:</label>
             <input type="text" id="pet_name" name="pet_name" required>
