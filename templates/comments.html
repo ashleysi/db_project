@@ -7,27 +7,76 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            min-height: 100vh;
         }
-
+        h1 {
+            margin-top: 0;
+            color: #ccc;
+        }
         table {
+            width: 90%; /* Adjust width to make the table fit better within the page */
+            max-width: 800px;
             border-collapse: collapse;
-            width: 80%;
-            margin: 20px auto;
+            background-color: #444; /* Matching the form container background */
+            margin-top: 20px; /* Add some spacing between the title and the table */
         }
-
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
+            border: 1px solid #777; /* Lighter border for better contrast */
             text-align: left;
         }
-
         th {
-            background-color: #ddd;
+            background-color: #555; /* Darker header for better visual separation */
+            color: #ccc; /* Lighter color for headers */
+        }
+        td {
+            background-color: #666; /* Slightly lighter background for rows */
+            color: #eee; /* Slightly lighter text color for readability */
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #fff;
+            background: #007bff; /* Solid color for better cross-browser compatibility */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #666; /* Lighter than body for visibility */
+            color: #fff; /* Text color */
+            border-radius: 3px;
+            font-size: 16px;
+        }
+        .back-btn:hover {
+            background-color: #777;
         }
     </style>
 </head>
 <body>
     <h1>User Comments</h1>
+    <a href="/search2" class="back-btn">&lt; Back</a>
     <table>
         <thead>
             <tr>
@@ -39,13 +88,12 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Loop through the user comments-->
             {% for comment in usercomments %}
             <tr>
-                <td>{{ comment.username }}</td> 
-                <td>{{ comment.comment }}</td> 
-                <td>{{ comment.created_at }}</td> 
-                <td>{{ comment.company_name }}</td> 
+                <td>{{ comment.username }}</td>
+                <td>{{ comment.comment }}</td>
+                <td>{{ comment.created_at }}</td>
+                <td>{{ comment.company_name }}</td>
                 <td>{{ comment.building_name }}</td>
             </tr>
             {% endfor %}

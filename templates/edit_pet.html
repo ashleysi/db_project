@@ -90,6 +90,27 @@
             display: inline-block; 
             margin: 0 auto 20px; 
         }
+        .alert {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    .alert.error {
+        color: #721c24; /* darker red for better readability */
+        background-color: #f8d7da; /* light red background */
+        border-color: #f5c6cb; /* light red border */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* subtle shadow for a lifted effect */
+    }
+
+    .alert.success {
+        color: #155724; /* dark green for text */
+        background-color: #d4edda; /* light green background */
+        border-color: #c3e6cb; /* light green border */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* subtle shadow for a lifted effect */
+    }
 
     </style>
 </head>
@@ -101,7 +122,14 @@
         </div>
     </div>
     <div class="container">
-        <h1>Your Pets</h1>
+        <h1>Edit Your Pets</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         {% if pets %}
             <table>
                 <thead>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, url_for, redirect, jsonify
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify, flash
 from passlib.hash import pbkdf2_sha256
 import pymysql.cursors
 import re
@@ -12,8 +12,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='root',
-    db='roomio',
+    password='Database',
+    db='Roomio2',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -23,7 +23,7 @@ def homepage():
     return render_template('index.html')
 
 def get_db_connection():
-    return pymysql.connect(host='127.0.0.1', user='root', password='root', db='roomio', cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(host='127.0.0.1', user='root', password='Database', db='Roomio2', cursorclass=pymysql.cursors.DictCursor)
 
 @app.template_filter()
 def format_currency(value):
@@ -154,34 +154,47 @@ def edit_pet():
 
 @app.route('/edit_pet_detail', methods=['GET', 'POST'])
 def edit_pet_detail():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Redirect to login if no user is logged in
+
+    username = session['username']
     conn = get_db_connection()
+
     if request.method == 'POST':
-        # Handle form submission
         pet_name = request.form['pet_name']
         pet_type = request.form['pet_type']
         new_pet_size = request.form['pet_size']
         original_pet_name = request.args.get('pet_name')
         original_pet_type = request.args.get('pet_type')
 
-        # Update the pet details in the database
-        query = '''
+        cursor = conn.cursor()
+        # Check for any other pets with the same new name and type that aren't the current pet
+        cursor.execute('SELECT 1 FROM Pets WHERE PetName = %s AND PetType = %s AND username = %s AND NOT (PetName = %s AND PetType = %s)',
+                       (pet_name, pet_type, username, original_pet_name, original_pet_type))
+        if cursor.fetchone():
+            flash("Duplicate pet detected. Please choose a different name or type.", 'error')
+            cursor.close()
+            conn.close()
+            return redirect(url_for('edit_pet'))
+        
+        # Update the pet details in the database if no duplicate is found
+        cursor.execute('''
             UPDATE Pets
             SET PetName = %s, PetType = %s, PetSize = %s
             WHERE PetName = %s AND PetType = %s AND username = %s
-        '''
-        cursor = conn.cursor()
-        cursor.execute(query, (pet_name, pet_type, new_pet_size, original_pet_name, original_pet_type, session['username']))
+        ''', (pet_name, pet_type, new_pet_size, original_pet_name, original_pet_type, username))
         conn.commit()
         cursor.close()
         conn.close()
+        flash('Pet details updated successfully.', 'success')
         return redirect(url_for('edit_pet'))
 
-    # If not POST, then it's a GET request: fetch the pet's current details
+    # For GET requests, fetch the current pet details
     pet_name = request.args.get('pet_name')
     pet_type = request.args.get('pet_type')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM Pets WHERE PetName = %s AND PetType = %s AND username = %s',
-                   (pet_name, pet_type, session['username']))
+                   (pet_name, pet_type, username))
     pet = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -193,11 +206,6 @@ def edit_pet_detail():
 
 @app.route('/add_pet', methods=['GET', 'POST'])
 def add_pet():
-
-    def check_input(pet_name, pet_type):
-        regex = r'^[a-zA-Z\s]+$'
-        return bool(re.match(regex, pet_name)) and bool(re.match(regex, pet_type))
-
     if 'username' not in session:
         return redirect(url_for('login'))
 
@@ -206,22 +214,31 @@ def add_pet():
         pet_type = request.form['pet_type']
         pet_size = request.form['pet_size']
         username = session['username']
-        
-        if not check_input(pet_name, pet_type):
-            input_error = 'No special characters or numbers allowed.'
-            return render_template('add_pet.html', error=input_error)
 
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # Check for duplicate pet entry
+        cursor.execute('SELECT 1 FROM Pets WHERE PetName = %s AND PetType = %s AND username = %s',
+                       (pet_name, pet_type, username))
+        if cursor.fetchone():
+            flash("A pet with this name and type already exists.", "error")
+            cursor.close()
+            conn.close()
+            return redirect(url_for('edit_pet'))
+
+        # Proceed to insert the new pet if no duplicate found
         query = 'INSERT INTO Pets (PetName, PetType, PetSize, username) VALUES (%s, %s, %s, %s)'
         cursor.execute(query, (pet_name, pet_type, pet_size, username))
         conn.commit()
         cursor.close()
         conn.close()
 
+        flash("New pet added successfully.", "success")
         return redirect(url_for('edit_pet'))
 
     return render_template('add_pet.html')
+
 
 @app.route('/delete_pet', methods=['POST'])
 def delete_pet():
@@ -625,31 +642,32 @@ def show_comments():
         return str(e)
 
 
-@app.route('/comment_page', methods=['GET','POST'])
+@app.route('/comment_page', methods=['GET', 'POST'])
 def leave_comment():
+    # Initialize default values or fetch from the session or request parameters as fallback
+    company_name = request.args.get('companyName', 'DefaultCompany')
+    building_name = request.args.get('buildingName', 'DefaultBuilding')
+
     if request.method == 'POST':
         conn = get_db_connection()
         cursor = conn.cursor()
 
         username = session.get('username')
         comment_text = request.form['comment']
-        
-    
-        company_name = request.args.get('companyName')
-        building_name = request.args.get('buildingName')
-
-        # Extract company name and building name from the request URL parameters
-#        company_name = request.args.get('company_name')
- #       building_name = request.args.get('building_name')
+        # Override defaults with POST data if present
+        company_name = request.form.get('companyName', company_name)
+        building_name = request.form.get('buildingName', building_name)
         
         query = "INSERT INTO usercomments (username, comment, company_name, building_name) VALUES (%s, %s, %s, %s)"
         cursor.execute(query, (username, comment_text, company_name, building_name))
         conn.commit()
-        
-        # go to comments page
-        return redirect(url_for('show_comments', company_name=company_name, building_name=building_name))
+        conn.close()
 
-    return render_template('comment_page.html')
+        # Go to comments page, now showing the new comment
+        return redirect(url_for('show_comments'))
+
+    # For GET requests, render the form with the company and building names available
+    return render_template('comment_page.html', company_name=company_name, building_name=building_name)
 
 
 if __name__ == '__main__':

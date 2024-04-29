@@ -1,15 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #444;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        textarea {
+            width: 80%; /* Makes the textarea 80% of its parent width */
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background-color: #555;
+            color: #fff;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background: linear-gradient(to right, #007bff, #6699ff); /* Gradient background */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease; /* Smooth transition for hover effect */
+            margin-top: 20px;
+        }
+        button:hover {
+            background: linear-gradient(to right, #0056b3, #337ab7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px); /* Slight raise */
+        }
+        button:active {
+            transform: translateY(1px); /* Mimics button press */
+        }
+    </style>
+    
     <title>Leave a Comment</title>
 </head>
 <body>
     <h1>Leave a Comment</h1>
-    <!-- <h1>Comments for {{ company_name }}, {{ building_name }}</h1> -->
     <form action="/comment_page" method="post">
-        <input type="hidden" name="companyName" value="{{ companyName }}">
-        <input type="hidden" name="building_name" value="{{ building_name }}">
-        
+        <!-- Ensure these names match the Flask route's expected parameters -->
+        <input type="hidden" name="companyName" value="{{ company_name }}">
+        <input type="hidden" name="buildingName" value="{{ building_name }}">
+
         <label for="comment">Your Comment:</label><br>
         <textarea id="comment" name="comment" rows="4" cols="50" required></textarea><br>
         <button type="submit">Submit Comment</button>
