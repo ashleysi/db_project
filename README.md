@@ -46,13 +46,14 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
 ### 🚧 Work In Progress
 
 - **More Advanced Search of Units**:
-  - Advanced search options including amenities and expected monthly rent.
 
-### ❌ Not Complete
+  - Advanced search options including amenities and expected monthly rent.
 
 - **Post and View Interests**:
 
   - Viewing and posting interests in specific apartment units.
+
+### ❌ Not Complete
 
 - **Search Interest**:
 
