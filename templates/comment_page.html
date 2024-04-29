@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave a Comment</title>
+</head>
+<body>
+    <h1>Leave a Comment</h1>
+    <!-- <h1>Comments for {{ company_name }}, {{ building_name }}</h1> -->
+    <form action="/comment_page" method="post">
+        <input type="hidden" name="companyName" value="{{ companyName }}">
+        <input type="hidden" name="building_name" value="{{ building_name }}">
+        
+        <label for="comment">Your Comment:</label><br>
+        <textarea id="comment" name="comment" rows="4" cols="50" required></textarea><br>
+        <button type="submit">Submit Comment</button>
+    </form>
+</body>
+</html>

@@ -610,5 +610,47 @@ def search():
                                company_name=company_name, building_name=building_name,
                               minimum_rent=minimum_rent, maximum_rent=maximum_rent)
 
+
+@app.route('/comments')
+def show_comments():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = 'SELECT username, comment, created_at, company_name, building_name FROM usercomments'
+        cursor.execute(query)
+        comments = cursor.fetchall()
+        conn.close()
+        return render_template('comments.html', usercomments=comments)
+    except Exception as e:
+        return str(e)
+
+
+@app.route('/comment_page', methods=['GET','POST'])
+def leave_comment():
+    if request.method == 'POST':
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        username = session.get('username')
+        comment_text = request.form['comment']
+        
+    
+        company_name = request.args.get('companyName')
+        building_name = request.args.get('buildingName')
+
+        # Extract company name and building name from the request URL parameters
+#        company_name = request.args.get('company_name')
+ #       building_name = request.args.get('building_name')
+        
+        query = "INSERT INTO usercomments (username, comment, company_name, building_name) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (username, comment_text, company_name, building_name))
+        conn.commit()
+        
+        # go to comments page
+        return redirect(url_for('show_comments', company_name=company_name, building_name=building_name))
+
+    return render_template('comment_page.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)

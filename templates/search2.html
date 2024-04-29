@@ -157,6 +157,21 @@
                     tr.appendChild(buttonTd);
     
                     tableBody.appendChild(tr);
+
+                    // View and add comments button
+                    const leaveCommentButton = document.createElement('button');
+                    leaveCommentButton.textContent = 'Comment';
+                    leaveCommentButton.onclick = function() {
+                        // Redirect to the comment page with unit details
+                        const unitId = row.UnitRentID; // Assuming UnitRentID is the unit identifier
+                        const companyName = row.CompanyName;
+                        const buildingName = row.BuildingName;
+                        window.location.href = `/comment_page?unitId=${encodeURIComponent(unitId)}&companyName=${encodeURIComponent(companyName)}&buildingName=${encodeURIComponent(buildingName)}`;
+                    };
+                    const leaveCommentTd = document.createElement('td');
+                    leaveCommentTd.appendChild(leaveCommentButton);
+                    tr.appendChild(leaveCommentTd);
+
                 });
             })
             .catch(error => console.error('Error:', error));

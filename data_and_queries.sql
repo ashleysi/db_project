@@ -1393,5 +1393,15 @@ CREATE TABLE Favorite (
 );
 
 
+CREATE TABLE usercomments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    comment TEXT NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    building_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+SELECT * FROM usercomments;
+
 
 

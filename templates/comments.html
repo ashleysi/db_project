@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Comments</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Comments</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Comment</th>
+                <th>Created At</th>
+                <th>Company Name</th>
+                <th>Building Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Loop through the user comments-->
+            {% for comment in usercomments %}
+            <tr>
+                <td>{{ comment.username }}</td> 
+                <td>{{ comment.comment }}</td> 
+                <td>{{ comment.created_at }}</td> 
+                <td>{{ comment.company_name }}</td> 
+                <td>{{ comment.building_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
