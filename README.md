@@ -28,11 +28,11 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
   - Users can view their pets and all assosciated information
   - No duplicate pets allowed
 
-  - **Display Unit and Building Info**: (Steven)
+- **Display Unit and Building Info**: (Steven)
   - Search and display detailed information about buildings and units.
   - View pet policies for every unit
 
-  - **Necessary Security Mechanisms**: (Ashley)
+- **Necessary Security Mechanisms**: (Ashley)
   - Implementing mechanisms to prevent SQL Injection and XSS attacks.
 
 - **Estimate Monthly Rent**: (Steven)
