@@ -18,8 +18,8 @@
             box-sizing: border-box;
         }
         .form-container {
-            width: 90%;
-            max-width: 800px;
+            width: 95%; /* Slightly increased width */
+            max-width: 1000px; /* Increased max width for better spacing */
             background-color: #444;
             padding: 20px;
             border-radius: 5px;
@@ -27,20 +27,25 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            overflow-x: auto; /* Ensures table is scrollable horizontally on smaller screens */
         }
         table {
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
+            table-layout: fixed; /* Helps with uniform column sizing */
         }
         th, td {
             padding: 8px;
-            border-bottom: 2px solid #999; /* Thicker and lighter border for better visibility */
-            border-right: 2px solid #999; /* Maintain uniform style for both vertical and horizontal separators */
+            border-bottom: 2px solid #999;
+            border-right: 2px solid #999;
             text-align: left;
+            white-space: nowrap; /* Prevents text from wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adds ellipsis for overflowed text */
         }
         th:last-child, td:last-child {
-            border-right: none; /* Remove right border from the last column */
+            border-right: none;
         }
         th {
             background-color: #555;
@@ -49,7 +54,7 @@
             color: #ccc;
             text-decoration: none;
             font-weight: bold;
-            align-self: flex-start;
+            align-self: center;
             margin-top: 10px;
             padding: 8px 16px;
             border-radius: 4px;
@@ -58,45 +63,37 @@
         a:hover {
             background-color: #777;
         }
-    .view-policy-btn {
-        padding: 5px 10px;
-        background-color: #4CAF50; /* Green background */
-        color: white;
-        border: none;
-        border-radius: 3px;
-        cursor: pointer;
-        display: inline-block; /* Ensures button respects padding and margin */
-        margin-top: 5px; /* Optional: adds space above the button */
-    }
-    .view-policy-btn:hover {
-        background-color: #45a049; /* Darker green on hover */
-    }
-
-    button {
-        padding: 10px 20px;
-        font-size: 16px;
-        color: #fff;
-        background: linear-gradient(to right, #007bff, #6699ff); /* Gradient background */
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        outline: none;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease; /* Smooth transition for hover effect */
-    }
-    button:hover {
-        background: linear-gradient(to right, #0056b3, #337ab7);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        transform: translateY(-2px); /* Slight raise */
-    }
-    button:active {
-        transform: translateY(1px); /* Mimics button press */
-    }
-    .unfavorite-button {
-        background-color: #ff3333; /* Red background color */
-        color: #ffffff; /* White text color */
-    }
-    </style>    
+        .view-policy-btn, button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .view-policy-btn:hover, button:hover {
+            background-color: #45a049;
+        }
+        button {
+            background: linear-gradient(to right, #007bff, #6699ff);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(to right, #0056b3, #337ab7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .unfavorite-button {
+            background-color: #ff3333;
+            color: #ffffff;
+        }
+    </style>
+        
 </head>
 <body>
     <div class="form-container">
@@ -109,8 +106,11 @@
                     <th>Monthly Rent</th>
                     <th>Square Footage</th>
                     <th>Available Date</th>
+                    <th>Rooms</th>
+                    <th>Average Rent Price</th>
                     <th>Pets Allowed</th>
                     <th>Action</th>
+                    <th>View Rooms</th>
                 </tr>
             </thead>
             <tbody>
@@ -121,12 +121,17 @@
                     <td>{{ unit.MonthlyRent | format_currency }}</td>
                     <td>{{ unit.squareFootage }}</td>
                     <td>{{ unit.AvailableDateForMoveIn.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ unit.RoomCount }}</td>
+                    <td>{{ unit.AvgRent | round(2) if unit.AvgRent else 'Data not available' }}</td>
                     <td>{{ 'Yes' if not unit.DisallowedPets else unit.DisallowedPets }}</td>
                     <td>
                         <button onclick="toggleFavorite(this, {{ unit.UnitRentID }}, {{ unit.IsFavorited }})"
                                 class="{{ 'unfavorite-button' if unit.IsFavorited else '' }}">
                             {{ 'Unfavorite' if unit.IsFavorited else 'Favorite' }}
                         </button>
+                    </td>
+                    <td>
+                        <button onclick="window.location.href='/view_rooms?unitRentID={{ unit.UnitRentID }}'" class="view-policy-btn">View Rooms</button>
                     </td>
                 </tr>
                 {% endfor %}

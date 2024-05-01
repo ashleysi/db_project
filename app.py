@@ -318,29 +318,54 @@ def view_units():
     if 'username' not in session:
         return 'Please log in to view this page', 401  # Redirect or handle not logged in users
 
-    username = session['username']  # Retrieve the logged-in user's username
+    username = session['username']
     conn = get_db_connection()
     company_name = request.args.get('companyName')
     building_name = request.args.get('buildingName')
 
     cursor = conn.cursor()
-    # Fetch unit details and interests
+    # Fetch unit details, interests, and count rooms
     query = """
         SELECT AU.UnitRentID, AU.unitNumber, AU.MonthlyRent, AU.squareFootage, AU.AvailableDateForMoveIn,
                IF(EXISTS(SELECT 1 FROM Favorite WHERE Favorite.UnitRentID = AU.UnitRentID AND Favorite.Username = %s), 1, 0) AS IsFavorited,
-               GROUP_CONCAT(DISTINCT CONCAT(U.first_name, ' ', U.last_name, ': ', I.RoommateCnt, ' roommates, moving in on ', I.MoveInDate) ORDER BY I.MoveInDate DESC SEPARATOR '; ') AS Interests
+               GROUP_CONCAT(DISTINCT CONCAT(U.first_name, ' ', U.last_name, ': ', I.RoommateCnt, ' roommates, moving in on ', I.MoveInDate) ORDER BY I.MoveInDate DESC SEPARATOR '; ') AS Interests,
+               (SELECT AVG(MonthlyRent) 
+                FROM ApartmentUnit AU2
+                JOIN ApartmentBuilding AB2 ON AU2.CompanyName = AB2.CompanyName AND AU2.BuildingName = AB2.BuildingName
+                WHERE AB2.AddrCity = (SELECT AddrCity FROM ApartmentBuilding WHERE CompanyName = %s AND BuildingName = %s)
+                AND ABS(AU2.squareFootage - AU.squareFootage) / AU.squareFootage <= 0.1) AS AvgRent,
+               (SELECT COUNT(*) FROM Rooms WHERE UnitRentID = AU.UnitRentID) AS RoomCount
         FROM ApartmentUnit AU
         LEFT JOIN Interests I ON AU.UnitRentID = I.UnitRentID
         LEFT JOIN Users U ON I.username = U.username
         WHERE AU.CompanyName = %s AND AU.BuildingName = %s
         GROUP BY AU.UnitRentID
     """
-    cursor.execute(query, (username, company_name, building_name))
+    cursor.execute(query, (username, company_name, building_name, company_name, building_name))
     units = cursor.fetchall()
     cursor.close()
     conn.close()
 
     return render_template('view_units.html', units=units, company_name=company_name, building_name=building_name)
+
+@app.route('/view_rooms')
+def view_rooms():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    unit_rent_id = request.args.get('unitRentID')
+    if not unit_rent_id:
+        return "Unit ID is required", 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM Rooms WHERE UnitRentID = %s', (unit_rent_id,))
+    rooms = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template('view_rooms.html', rooms=rooms)
+
 
 
 @app.route('/view_pet_policy')

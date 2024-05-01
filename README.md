@@ -47,18 +47,14 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
 - **Comment System**: (Ashley)
   - User can leave a comment for certain units
 
+- **Extra View on the Rent Price**: (Ashley)
+
+  - Display the average price of similar units within the same city.
+
 ### 🚧 Work In Progress
 - **Post and View Interests**: (Ashley)
 
   - Viewing and posting interests in specific apartment units.
-
-- **More Advanced Search of Units**:
-
-  - Advanced search options including amenities and expected monthly rent.
-
-- **Extra View on the Rent Price**:
-
-  - Display the average price of similar units within the same city.
 
 ## Setup Instructions
 
@@ -68,7 +64,6 @@ Group Members: Samantha Augustin, Steven Granaturov, Ashley Simons
 - Insert all values from sample_data.txt
 - Passwords for all those accounts is 'password'
 
-Favorite table:
 CREATE TABLE Favorite (
 FavoriteID INT AUTO_INCREMENT PRIMARY KEY,
 Username VARCHAR(20) NOT NULL,
@@ -76,4 +71,13 @@ UnitRentID INT NOT NULL,
 FOREIGN KEY (Username) REFERENCES Users(username),
 FOREIGN KEY (UnitRentID) REFERENCES ApartmentUnit(UnitRentID),
 UNIQUE (Username, UnitRentID)
+);
+
+CREATE TABLE usercomments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    comment TEXT NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    building_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
