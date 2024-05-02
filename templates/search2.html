@@ -94,6 +94,8 @@
     <div class="form-container">
         <form id="searchForm">
             <!-- City and State cannot have special characters or numbers-->
+            <input type="text" id="company" name="company" placeholder="Company Name">
+            <input type="text" id="building" name="building" placeholder="Building Name">
             <input type="text" id="state" name="state" placeholder="State" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
             <input type="text" id="city" name="city" placeholder="City" oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
             <!-- Accept an input that only takes digits and is of length 5 exactly-->
@@ -162,7 +164,7 @@
                     const leaveCommentButton = document.createElement('button');
                     leaveCommentButton.textContent = 'Comment';
                     leaveCommentButton.onclick = function() {
-                        const unitId = row.UnitRentID; 
+                        const unitId = row.UnitRentID;
                         const companyName = row.CompanyName;
                         const buildingName = row.BuildingName;
                         window.location.href = `/comment_page?unitId=${encodeURIComponent(unitId)}&companyName=${encodeURIComponent(companyName)}&buildingName=${encodeURIComponent(buildingName)}`;
@@ -170,6 +172,19 @@
                     const leaveCommentTd = document.createElement('td');
                     leaveCommentTd.appendChild(leaveCommentButton);
                     tr.appendChild(leaveCommentTd);
+
+                    // View comments button
+                    const viewCommentsButton = document.createElement('button');
+                    viewCommentsButton.textContent = 'View Comments';
+                    viewCommentsButton.className = 'view-comments-btn'; // Added class for potential styling
+                    viewCommentsButton.onclick = function() {
+                        const companyName = row.CompanyName;
+                        const buildingName = row.BuildingName;
+                        window.location.href = `/view_comments?companyName=${encodeURIComponent(companyName)}&buildingName=${encodeURIComponent(buildingName)}`;
+                    }
+                    const viewCommentTd = document.createElement('td');
+                    viewCommentTd.appendChild(viewCommentsButton);
+                    tr.appendChild(viewCommentTd);
 
                 });
             })

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments for {{ company_name }}, {{ building_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 80%;
+            max-width: 800px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #555;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #555;
+        }
+        tr:nth-child(even) {
+            background-color: #444;
+        }
+        p {
+            color: #bbb;
+        }
+        a {
+            color: #61dafb;
+            text-decoration: none;
+            padding: 8px 16px;
+            background-color: #666;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        a:hover {
+            background-color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comments for {{ company_name }}, {{ building_name }}</h1>
+    {% if comments %}
+        <table>
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments %}
+                    <tr>
+                        <td><strong>{{ comment.username }}</strong></td>
+                        <td>{{ comment.comment }}</td>
+                        <td>{{ comment.created_at }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No comments found.</p>
+    {% endif %}
+    <a href="/search2">Back to Search</a>
+</body>
+</html>

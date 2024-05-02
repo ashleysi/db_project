@@ -12,8 +12,8 @@ conn = pymysql.connect(
     #host='localhost',
     port=3306,
     user='root',
-    password='Database',
-    db='Roomio2',
+    password='083723',
+    db='Roomio',
     charset='utf8mb4',
     cursorclass=pymysql.cursors.DictCursor
 )
@@ -23,7 +23,7 @@ def homepage():
     return render_template('index.html')
 
 def get_db_connection():
-    return pymysql.connect(host='127.0.0.1', user='root', password='Database', db='Roomio2', cursorclass=pymysql.cursors.DictCursor)
+    return pymysql.connect(host='127.0.0.1', user='root', password='083723', db='Roomio', cursorclass=pymysql.cursors.DictCursor)
 
 @app.template_filter()
 def format_currency(value):
@@ -36,15 +36,10 @@ def register():
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
     username = request.form['username']
-    submitted_password = request.form['password']  # The password submitted by the user during login
+    submitted_password = request.form['password'] 
 
     cursor = conn.cursor()
-
-    # Query to get the stored hashed password for the given username
-    # This is a paramaterized query which prevent SQL injection because it treats the input as DATA not an executable
-    # This line takes the username as %s serving as the temporary placeholder
     query = 'SELECT passwd FROM Users WHERE username = %s'
-    # In this line, the actual username value from the database is used (must be a tuple even with only one parameter)
     cursor.execute(query, (username,))
 
     data = cursor.fetchone()
@@ -279,6 +274,8 @@ def search2_results():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    company = request.form.get('company')
+    building = request.form.get('building')
     state = request.form.get('state')
     city = request.form.get('city')
     zipCode = request.form.get('zipCode')
@@ -290,6 +287,10 @@ def search2_results():
     # List to hold the conditions
     conditions = []
 
+    if company:
+        conditions.append(f"CompanyName = '{company}'")
+    if building:
+        conditions.append(f"BuildingName = '{building}'")
     if state:
         conditions.append(f"AddrState = '{state}'")
     if city:
@@ -312,6 +313,7 @@ def search2_results():
         return jsonify({"error": str(e)})
     finally:
         cursor.close()
+
 
 @app.route('/view/units')
 def view_units():
@@ -637,17 +639,11 @@ def search():
         if maximum_rent:
             add_ons = add_ons  + [maximum_rent]
     
-        #cursor.execute(query1,(building_name, company_name))
         cursor.execute(query1,add_ons)
         units = cursor.fetchall()
 
 
         cursor.close()
-            
-        #return render_template('search.html', user=user)
-
-        #return render_template('search.html', user=user, units=units)
-
         return render_template('search.html', user=user, units=units,
                                company_name=company_name, building_name=building_name,
                               minimum_rent=minimum_rent, maximum_rent=maximum_rent)
@@ -666,10 +662,34 @@ def show_comments():
     except Exception as e:
         return str(e)
 
+@app.route('/view_comments')
+def view_comments():
+    company_name = request.args.get('companyName')
+    building_name = request.args.get('buildingName')
+    
+    if not company_name or not building_name:
+        return 'Building not specified', 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        query = '''
+            SELECT username, comment, created_at
+            FROM usercomments
+            WHERE company_name = %s AND building_name = %s
+            ORDER BY created_at DESC
+        '''
+        cursor.execute(query, (company_name, building_name))
+        comments = cursor.fetchall()
+        return render_template('view_comments.html', comments=comments, company_name=company_name, building_name=building_name)
+    except Exception as e:
+        return f"Error retrieving comments: {str(e)}", 500
+    finally:
+        cursor.close()
+
 
 @app.route('/comment_page', methods=['GET', 'POST'])
 def leave_comment():
-    # Initialize default values or fetch from the session or request parameters as fallback
     company_name = request.args.get('companyName', 'DefaultCompany')
     building_name = request.args.get('buildingName', 'DefaultBuilding')
 
@@ -679,7 +699,6 @@ def leave_comment():
 
         username = session.get('username')
         comment_text = request.form['comment']
-        # Override defaults with POST data if present
         company_name = request.form.get('companyName', company_name)
         building_name = request.form.get('buildingName', building_name)
         
@@ -688,10 +707,8 @@ def leave_comment():
         conn.commit()
         conn.close()
 
-        # Go to comments page, now showing the new comment
         return redirect(url_for('show_comments'))
 
-    # For GET requests, render the form with the company and building names available
     return render_template('comment_page.html', company_name=company_name, building_name=building_name)
 
 
